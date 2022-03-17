@@ -1,0 +1,166 @@
+service: billzero
+disabledDeprecations: '*'
+custom:
+  stage: "${opt:stage, self:provider.stage}"
+  settingsTable: "${self:service}-${self:custom.stage}-settings"
+  adminTable: "${self:service}-${self:custom.stage}-admin"
+  userTable: "${self:service}-${self:custom.stage}-users"
+  billTable: "${self:service}-${self:custom.stage}-bills"
+  vendorTable: "${self:service}-${self:custom.stage}-vendors"
+  searchVendorTable: "${self:service}-${self:custom.stage}-searchvendor"
+  chargeTable: "${self:service}-${self:custom.stage}-charges"
+  transactionTable: "${self:service}-${self:custom.stage}-transactions"
+  subscriptionsTable: "${self:service}-${self:custom.stage}-subscriptions"
+  statsTable: "${self:service}-${self:custom.stage}-stats"
+  supportTable: "${self:service}-${self:custom.stage}-support"
+  tasksTable: "${self:service}-${self:custom.stage}-tasks"
+  promocodeTable: "${self:service}-${self:custom.stage}-promocode"
+  reportTable: "${self:service}-${self:custom.stage}-report"
+  affiliateTable: "${self:service}-${self:custom.stage}-affiliate"
+  invitationTable: "${self:service}-${self:custom.stage}-invitation"
+  karmaTable: "${self:service}-${self:custom.stage}-karma"
+  utouTable: "${self:service}-${self:custom.stage}-utou"
+  sheltersTable: "${self:service}-${self:custom.stage}-shelters"
+  finoHookTable: "${self:service}-${self:custom.stage}-finohook"
+  ingestionTable: "${self:service}-${self:custom.stage}-ingest"
+  playTable: "${self:service}-${self:custom.stage}-play"
+  poolTable: "${self:service}-${self:custom.stage}-pool"
+  uniqueviewTable: "${self:service}-${self:custom.stage}-uniqueview"
+  engagementTable: "${self:service}-${self:custom.stage}-engagement"
+  impetusTable: "${self:service}-${self:custom.stage}-impetus"
+
+  profiles:
+    dev: devProfile
+    prod: prodProfile
+  taskarns: # ${self:custom.taskarns.${self:provider.stage}}
+    dev: "arn:aws:dynamodb:us-east-1:853862264986:table/billzero-dev-tasks/stream/2019-07-10T22:31:31.290"
+    prod: "arn:aws:dynamodb:us-east-1:853862264986:table/billzero-prod-tasks/stream/2019-07-16T17:02:01.080"
+  uvarns: # ${self:custom.uvarns.${self:provider.stage}}
+    dev: "arn:aws:dynamodb:us-east-1:853862264986:table/billzero-dev-uniqueview/stream/2021-08-10T18:13:51.809"
+    prod: "arn:aws:dynamodb:us-east-1:853862264986:table/billzero-prod-uniqueview/stream/2021-08-11T19:48:01:693"
+
+plugins:
+  - serverless-offline
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: prod
+  region: us-east-1
+  versionFunctions: false # optional, default is true
+  profile: ${self:custom.profiles.${self:provider.stage}}
+  memorySize: 1024 # The default is 1024
+  timeout: 30 # The default is 6
+  environment: ${file(env.yml):${self:custom.stage}}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+        - "dynamodb:*"
+        - "sns:*"
+        - "s3:*"
+        - "cloudformation:describeStacks"
+        - "lambda:InvokeFunction"
+        - "sts:AssumeRole"
+      Resource:
+        - "arn:aws:dynamodb:*:*:*"
+        - "arn:aws:sns:*:*:*"
+        - "arn:aws:s3:::*"
+        - "arn:aws:sqs:us-east-1:*:*"
+
+package:
+  include:
+    - env.yml
+    - src/**
+    - data/**
+  exclude:
+    - .git/**
+
+functions:
+  AdminManage:
+    handler: handler.AdminManage
+    events:
+      - http:
+          path: v1/admin/{fn}
+          method: post
+          cors: true
+      - http:
+          path: v1/admin/{fn}
+          method: options
+          cors: true
+  UserManage:
+    handler: handler.UserManage
+    events:
+      - http:
+          path: v1/user/{fn}
+          method: post
+          cors: true
+      - http:
+          path: v1/user/{fn}
+          method: options
+          cors: true
+  BillManage:
+    handler: handler.BillManage
+    events:
+      - http:
+          path: v1/bills/{fn}
+          method: post
+          cors: true
+      - http:
+          path: v1/bills/{fn}
+          method: options
+          cors: true
+  TransactionManage:
+    handler: handler.TransactionManage
+    events:
+      - http:
+          path: v1/transactions/{fn}
+          method: post
+          cors: true
+      - http:
+          path: v1/transactions/{fn}
+          method: options
+          cors: true
+  VendorManage:
+    handler: handler.VendorManage
+    events:
+      - http:
+          path: v1/vendors/{fn}
+          method: post
+          cors: true
+      - http:
+          path: v1/vendors/{fn}
+          method: options
+          cors: true
+  IngestManage:
+    handler: handler.IngestManage
+    timeout: 30
+    events:
+      - http:
+          path: v1/ingest/{fn}
+          method: post
+          cors: true
+      - http:
+          path: v1/ingest/{fn}
+          method: options
+          cors: true
+#      - schedule:
+#          rate: rate(2 hours)
+  processTask:
+    handler: handler.processTask
+    timeout: 30
+    events:
+      - stream:
+          type: dynamodb
+          batchSize: 10
+          startingPosition: TRIM_HORIZON
+          arn: ${self:custom.taskarns.${self:provider.stage}}
+  processCycleForUV:
+    handler: handler.processCycle
+    timeout: 600
+#    events:
+#      - stream:
+#          type: dynamodb
+#          batchSize: 10
+#          batchWindow: 60
+#          startingPosition: TRIM_HORIZON
+#          arn: ${self:custom.uvarns.${self:provider.stage}}

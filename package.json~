@@ -1,0 +1,51 @@
+{
+  "name": "billzero",
+  "version": "1.0.1",
+  "description": "BillZero-bill pay, crowd pay, share",
+  "main": "handler.js",
+  "scripts": {
+    "deploy-dev": "sls deploy -s dev",
+    "deploy-prod": "sls deploy -s prod",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/00100001/bz-api.git"
+  },
+  "keywords": [
+    "billzero"
+  ],
+  "author": "n8",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/00100001/bz-api/issues"
+  },
+  "homepage": "https://github.com/00100001/bz-api#readme",
+  "dependencies": {
+    "@sendgrid/mail": "^6.4.0",
+    "ajv": "^6.10.2",
+    "aws-sdk": "^2.569.0",
+    "axios": "^0.20.0",
+    "firebase-admin": "^8.7.0",
+    "generate-password": "^1.4.2",
+    "is-empty": "^1.2.0",
+    "jsdom": "^16.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "loadash": "^1.0.0",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.33",
+    "random-word": "^2.0.0",
+    "randomatic": "^3.1.1",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5",
+    "stripe": "^7.13.0",
+    "twilio": "^3.37.0",
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {
+    "jest": "^27.0.4",
+    "mockdate": "^3.0.5",
+    "serverless-offline": "^8.5.0",
+    "yamljs": "^0.3.0"
+  }
+}
