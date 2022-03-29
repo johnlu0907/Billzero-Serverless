@@ -1600,16 +1600,20 @@ class userclass {
   // ---------------------------------------------------------------------------
   async getn8(event) {
     try {
-      var jwtDecode = await this.services.authcl.auth(event);
+
+      console.log('n8:try', error);
+
+      //var jwtDecode = await this.services.authcl.auth(event);
 
       //get data
-      let data = await this.services.dbcl.getAdminSettings("pp");
+      //let data = await this.services.dbcl.getAdminSettings("pp");
 
 
 
 
       return {
-        body: data.settings.body,
+        //body: data.settings.body,
+        console.log('n8:err', error);
       };
     } catch (error) {
       throw error;
