@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/billzeroinc/bz.api.git"
+    "url": "git+https://github.com/00100001/bz-api.git"
   },
   "keywords": [
     "billzero"
@@ -18,10 +18,11 @@
   "author": "n8",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/billzeroinc/bz.api/issues"
+    "url": "https://github.com/00100001/bz-api/issues"
   },
-  "homepage": "https://github.com/billzeroinc/bz.api#readme",
+  "homepage": "https://github.com/00100001/bz-api#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.118.1",
     "@sendgrid/mail": "^6.4.0",
     "ajv": "^6.10.2",
     "aws-sdk": "^2.569.0",

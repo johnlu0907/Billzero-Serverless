@@ -260,6 +260,12 @@ module.exports.UserManage = async (event) => {
       } else if (fn == "creates3presignedurl") {
         response.OK.body.payload = await usercl.createAwsS3PutPresignedUrl(event);
         return response.success();
+      } else if (fn == "creates3thxpresignedurl") {
+        response.OK.body.payload = await usercl.createAwsS3PutThxPresignedUrl(event);
+        return response.success();
+      } else if (fn == "awsS3PictureDeletion") {
+        response.OK.body.payload = await usercl.AwsS3PictureDeletion(event)
+        return response.success
       } else if (fn == "addpaymentmethod") {
         response.OK.body.payload = await usercl.addPaymentMethod(event);
         return response.success();

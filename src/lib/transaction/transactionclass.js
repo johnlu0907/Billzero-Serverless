@@ -171,6 +171,7 @@ class transactionClass {
                 profileImage: "undefined",
                 thanks: false,
                 address: { city: "undefined", state: "undefined" },
+                phone: "undefined",
               };
           let obj = {
             id: tr.payerId,
@@ -181,6 +182,7 @@ class transactionClass {
             profileImage: trPayer.profileImage,
             city: trPayer.address.city,
             state: trPayer.address.state,
+            phone: trPayer.phone,
             transactions: [
               {
                 id: tr.id,

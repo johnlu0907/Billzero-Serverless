@@ -7,6 +7,8 @@ const crypto = require("crypto");
 const empty = require("is-empty");
 const pwdgen = require("generate-password");
 const randomize = require("randomatic");
+import { S3Client, DeleteBucketCommand } from "@aws-sdk/client-s3";
+
 var Ajv = require("ajv");
 var ajv = new Ajv({ useDefaults: true });
 
@@ -20,6 +22,7 @@ class userclass {
     for (var parameter in args) {
       this[parameter] = args[parameter];
     }
+    this.count = 0;
     this.services.addService("usercl", this);
     this.secret = process.env.JWTSECRET;
 
@@ -1478,6 +1481,70 @@ class userclass {
     }
   }
 
+  async createAwsS3PutThxPresignedUrl(event) {
+    try {
+      var jwtDecode = await this.services.authcl.auth(event);
+      if (jwtDecode.id === process.env.DEFAULTUSERID) {
+        throw "Forbidden";
+      }
+      var data = JSON.parse(event.body);
+      if (data) {
+        data.fileName =
+          data.uri && data.uri.trim() ? data.uri : `thx${this.count}.jpg`;
+        this.count = this.count + 1;
+        var path = "users/" + jwtDecode.id + "/" + data.fileName;
+        // let imagePath =
+        //       "users/" +
+        //       jwtDecode.id +
+        //       "/" +
+        //       uuid.v4();
+        //     imageUrl = await this.services.dbcl.uploadBase64ImageToAwsS3(
+        //       imagePath,
+        //       data.fileName
+        //     );
+
+
+        var presignedUrl = await this.services.dbcl.createAwsS3PutPresignedUrl(
+          path,
+          3000
+        );
+        var imageUrl = presignedUrl.split("?")[0];
+        return {
+          presignedUrl: presignedUrl,
+          imageUrl: imageUrl,
+          presignedUrlTTL: 3000,
+        };
+        
+      } else {
+        throw "InvalidPayload";
+      }
+    } catch (error) {
+      throw error;
+    }
+    
+  }
+
+  async AwsS3PictureDeletion(event) {
+
+    try {
+      var jwtDecode = await this.services.authcl.auth(event);
+      var data = JSON.parse(event.body);
+      var s3Bucket = data.bucketParams.Bucket
+      var s3Key = data.bucketParams.Key
+      // Delete the object.
+      // console.log(`\nDeleting object "${bucketParams.Key}"} from bucket`);
+      var deletePicture = await s3Client.send(
+        new DeleteObjectCommand({ Bucket: s3Bucket, Key: s3Key })
+      );
+      return deletePicture
+    } catch (err) {
+      console.log("Error deleting object", err);
+      return err
+    }
+
+
+  }
+
   async getUserSupportTickets(event) {
     try {
       var jwtDecode = await this.services.authcl.auth(event);
@@ -1600,20 +1667,16 @@ class userclass {
   // ---------------------------------------------------------------------------
   async getn8(event) {
     try {
-
-      console.log('n8:try', error);
-
-      //var jwtDecode = await this.services.authcl.auth(event);
+      var jwtDecode = await this.services.authcl.auth(event);
 
       //get data
-      //let data = await this.services.dbcl.getAdminSettings("pp");
+      let data = await this.services.dbcl.getAdminSettings("pp");
 
 
 
 
       return {
-        //body: data.settings.body,
-        console.log('n8:err', error);
+        body: data.settings.body,
       };
     } catch (error) {
       throw error;
