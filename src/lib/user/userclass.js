@@ -7,8 +7,7 @@ const crypto = require("crypto");
 const empty = require("is-empty");
 const pwdgen = require("generate-password");
 const randomize = require("randomatic");
-import { S3Client, DeleteBucketCommand } from "@aws-sdk/client-s3";
-
+//Test
 var Ajv = require("ajv");
 var ajv = new Ajv({ useDefaults: true });
 

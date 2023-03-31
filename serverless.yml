@@ -115,7 +115,7 @@ functions:
         - http:
             path: v1/transactions/{fn}
             method: options
-            cors: true  
+            cors: true
     VendorManage:
       handler: handler.VendorManage
       events: 

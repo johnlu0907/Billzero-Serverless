@@ -118,6 +118,9 @@ module.exports.AdminManage = async (event) => {
       } else if (fn === "getactiveusers") {
         response.OK.body.payload = await admincl.getActiveUsers(event);
         return response.success();
+      } else if (fn === "getallusers") {
+        response.OK.body.payload = await admincl.getAllUsers(event);
+        return response.success();
       } else if (fn === "getloggedinusers") {
         response.OK.body.payload = await admincl.getLoggedinUsers(event);
         return response.success();
@@ -214,6 +217,9 @@ module.exports.AdminManage = async (event) => {
         return response.success("<Response><Message>static response</Message></Response>");
       } else if (fn === "setpotrate") {
         response.OK.body.payload = await admincl.setPotRate(event);
+        return response.success();
+      } else if (fn === "updateUserFromAdmin") {
+        response.OK.body.payload = await admincl.updateUserFromAdmin(event);
         return response.success();
       } else {
         return response.fail("BadRequest");
@@ -444,7 +450,7 @@ module.exports.TransactionManage = async (event) => {
 };
 
 module.exports.VendorManage = async (event) => {
-  iconsole.log(event);
+  console.log(event);
   const response = new responseclass();
   if (event.httpMethod === 'OPTIONS') {
     return response.options();

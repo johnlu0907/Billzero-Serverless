@@ -1579,19 +1579,19 @@ class dbHelperClass {
     }
   }
 
-  async getBillTransactions(bill_id) {
-    this.iconsole.log(bill_id);
+  async getBillTransactions(billId) {
+    this.iconsole.log(billId);
     try {
       var queryParams = {
         TableName: this.transactionTable,
         IndexName: this.billsTransactionsUpdatedAtIndex,
         ScanIndexForward: false, // true = ascending, false = descending
-        KeyConditionExpression: "#bill_id = :bill_id",
+        KeyConditionExpression: "#billId = :billId",
         ExpressionAttributeNames: {
-          "#bill_id": "bill_id",
+          "#billId": "billId",
         },
         ExpressionAttributeValues: {
-          ":bill_id": bill_id,
+          ":billId": billId,
         },
       };
       let res = await this.queryTable(queryParams);
@@ -1942,6 +1942,25 @@ class dbHelperClass {
       let res = await this.queryTable(queryParams);
       return res.Items;
     } catch (error) {
+      throw error;
+    }
+  }
+
+  //get all users regardless of any conditions
+  async getAllUsers() {
+    var getParams = {
+      TableName: this.userTable,
+    };
+
+    try {
+      let data = await dynamoDb.scan(getParams).promise();
+      if (Object.keys(data).length === 0) {
+        throw "Invalid";
+      } else {
+        return data.Items;
+      }
+    } catch (error) {
+      this.iconsole.log("=== ERROR ===", error);
       throw error;
     }
   }

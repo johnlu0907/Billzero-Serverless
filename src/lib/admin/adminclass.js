@@ -259,6 +259,54 @@ class adminClass {
     }
   }
 
+  async updateUserFromAdmin(event) {
+    try {
+      var jwtDecode = await this.services.authcl.auth(event);
+      if (jwtDecode.role && jwtDecode.role === "admin") {
+        var data = JSON.parse(event.body);
+        if (data && data.payload && Object.keys(data.payload).length) {
+          let user = await this.services.dbcl.getUser(data.uid);
+          let updateUserRules = {
+            options: [
+              "firstName",
+              "lastName",
+              "profileImage",
+              "address",
+              "dob",
+              "social",
+              "veteran",
+              "homeless",
+              "gender",
+              "userName",
+              "settings",
+              "devTokens",
+              "active",
+              "geo",
+              "ssn",
+              "shelter",
+            ],
+            action: "allow",
+          };
+
+          let numChanges = this.services.utils.updateObject(
+            data.payload,
+            user,
+            updateUserRules
+          );
+          user = await this.services.dbcl.putUser(user);
+          delete user.password;
+          return user;
+        } else {
+          throw "InvalidPayload";
+        }
+      } else {
+        throw "Forbidden";
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async adminUserLogin(event) {
     try {
       var data = JSON.parse(event.body);
@@ -733,6 +781,32 @@ class adminClass {
               ? "true"
               : "false";
           let result = await this.services.dbcl.getActiveUsers(data.active);
+          result.forEach((user) => {
+            user.profileImage = user.profileImage
+              ? user.profileImage
+              : "https://" +
+              process.env.BZ_S3_BACKET +
+              ".s3.amazonaws.com/users/profileImageDefault.jpg";
+          });
+          return result;
+        } else {
+          throw "InvalidPayload";
+        }
+      } else {
+        throw "Forbidden";
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllUsers(event) {
+    try {
+      var jwtDecode = await this.services.authcl.auth(event);
+      if (jwtDecode.role && jwtDecode.role === "admin") {
+        
+        if (data) {
+          let result = await this.services.dbcl.getAllUsers();
           result.forEach((user) => {
             user.profileImage = user.profileImage
               ? user.profileImage
