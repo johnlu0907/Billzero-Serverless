@@ -804,20 +804,15 @@ class adminClass {
     try {
       var jwtDecode = await this.services.authcl.auth(event);
       if (jwtDecode.role && jwtDecode.role === "admin") {
-        
-        if (data) {
-          let result = await this.services.dbcl.getAllUsers();
-          result.forEach((user) => {
-            user.profileImage = user.profileImage
-              ? user.profileImage
-              : "https://" +
-              process.env.BZ_S3_BACKET +
-              ".s3.amazonaws.com/users/profileImageDefault.jpg";
-          });
-          return result;
-        } else {
-          throw "InvalidPayload";
-        }
+        let result = await this.services.dbcl.getAllUsers();
+        result.forEach((user) => {
+          user.profileImage = user.profileImage
+            ? user.profileImage
+            : "https://" +
+            process.env.BZ_S3_BACKET +
+            ".s3.amazonaws.com/users/profileImageDefault.jpg";
+        });
+        return result;
       } else {
         throw "Forbidden";
       }
