@@ -76,7 +76,6 @@ class authclass {
         issuer: this.iss,
         algorithms: ["RS256"],
       };
-
       return await jwt.verify(token, this.publicKey, verifyOptions);
     } catch (error) {
       throw error;
@@ -87,7 +86,13 @@ class authclass {
     this.iconsole.log();
     try {
       if (event.headers[process.env.JWTHDRPARAM]) {
-        return await this.verify(event.headers[process.env.JWTHDRPARAM]);
+        const jwtDecode = await this.verify(event.headers[process.env.JWTHDRPARAM]);
+        const user = await this.services.dbcl.getUser(jwtDecode.id);
+        if (user.active === 'false') {
+          throw "Disabled";
+        } else {
+          return await this.verify(event.headers[process.env.JWTHDRPARAM]);
+        }
       } else {
         throw "Unauthorized";
       }

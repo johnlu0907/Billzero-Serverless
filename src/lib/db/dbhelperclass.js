@@ -1948,17 +1948,18 @@ class dbHelperClass {
 
   //get all users regardless of any conditions
   async getAllUsers() {
-    var getParams = {
+    var queryParams = {
       TableName: this.userTable,
     };
 
     try {
-      let data = await dynamoDb.scan(getParams).promise();
-      if (Object.keys(data).length === 0) {
-        throw "Invalid";
-      } else {
-        return data.Items;
-      }
+      let data = await (await dynamoDb.scan(queryParams).promise()).Items;
+      data.sort((a, b) => {
+        if (new Date(a.createdAt) > new Date(b.createdAt)) return -1;
+        if (new Date(a.createdAt) < new Date(b.createdAt)) return 1;
+        return 0
+      })
+      return data;
     } catch (error) {
       this.iconsole.log("=== ERROR ===", error);
       throw error;

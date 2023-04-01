@@ -216,7 +216,7 @@ class billClass {
     try {
       var jwtDecode = await this.services.authcl.auth(event);
       var data = JSON.parse(event.body);
-      console.log(data)
+      console.log(data);
       var userBills = [];
       if (data && data.id) {
         userBills = await this.services.dbcl.getUserBills(data.id);
@@ -252,7 +252,9 @@ class billClass {
               await this.services.dbcl.putUserUV(user.id, viewer.id);
 
               let msg = "BillZero | @" + viewer.userName + " viewed your Bills";
-              console.log(`BillZero | @${viewer.userName} viewed ${user.userName} Bills`);
+              console.log(
+                `BillZero | @${viewer.userName} viewed ${user.userName} Bills`
+              );
               await this.services.msgcl.notifyUser(user.id, msg);
             }
           } else {
@@ -592,6 +594,57 @@ class billClass {
     }
   }
 
+  async forceUpdateBill(event) {
+    var user = null;
+
+    try {
+      var jwtDecode = await this.services.authcl.auth(event);
+      var data = JSON.parse(event.body);
+      if (data && data.billId) {
+        if (jwtDecode.role && jwtDecode.role === "admin") {
+          user = await this.services.dbcl.getUser(jwtDecode.id);
+          let dbBill = await this.services.dbcl.getBillById(data.billId);
+          // let dbBill = await this.services.dbcl.getBillById(data.billId);
+          this.iconsole.log("dbBill::", dbBill);
+          if (dbBill) {
+            let updateUserRules = {
+              options: [
+                "uid",
+                "accountData",
+                "accountId",
+                "accountNumber",
+                "active",
+                "balance",
+                "billerType",
+                "bztype",
+                "updatedAt",
+                "dl",
+                "dueDate",
+                "hookEvent",
+                "image",
+              ],
+              action: "allow",
+            };
+
+            let numChanges = this.services.utils.updateObject(
+              data.payload,
+              dbBill,
+              updateUserRules
+            );
+            const bill = await this.services.dbcl.putUserBill(dbBill);
+            return bill;
+          } else {
+            throw "Not Exist";
+          }
+        }
+      } else {
+        throw "InvalidPayload";
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async refreshBill(event) {
     try {
       var jwtDecode = await this.services.authcl.auth(event);
@@ -676,7 +729,7 @@ class billClass {
     try {
       var jwtDecode = await this.services.authcl.auth(event);
       var data = JSON.parse(event.body);
-      console.log('forceRefreshBill - ', data);
+      console.log("forceRefreshBill - ", data);
       if (data && data.billId && data.accountId) {
         if (jwtDecode.id === process.env.DEFAULTUSERID) {
           throw "Forbidden";
@@ -726,7 +779,7 @@ class billClass {
             accountId
           );
           bill.paymentMethods = payMethods.paymentMethods;
-          console.log('forceRefreshBill - createuserBillLink ', bill);
+          console.log("forceRefreshBill - createuserBillLink ", bill);
           try {
             const result = await createUserBillLink(user, bill, true);
 
@@ -740,9 +793,8 @@ class billClass {
               url: url,
             };
             await this.services.dbcl.putPromocode(billpromo);
-            console.log('==Branch createUserBillLink 1:', url)
+            console.log("==Branch createUserBillLink 1:", url);
           } catch (error) {
-
             this.iconsole.log("===Branch Error:", error);
           }
           if (
@@ -1219,9 +1271,9 @@ class billClass {
             var charge = {
               amount: Number(stripeCharge.amount) / 100,
               amountToAddBalance: dataBillZeroFees.amount,
-              uid: user.id,       // payer
+              uid: user.id, // payer
               chargeid: stripeCharge.id,
-              billId: bill.id,    // payee
+              billId: bill.id, // payee
               billAccountNumber: bill.accountNumber,
               billUserId: bill.uid,
 
@@ -1491,7 +1543,7 @@ class billClass {
     }
   }
 
-    async processFinoBillWebHook(event) {
+  async processFinoBillWebHook(event) {
     try {
       this.iconsole.log(event);
       console.log(event.body);
@@ -1740,7 +1792,10 @@ class billClass {
                   });
 
                   try {
-                    console.log('processFinoBillWebHook - createuserBillLink ', bill);
+                    console.log(
+                      "processFinoBillWebHook - createuserBillLink ",
+                      bill
+                    );
                     const user = await this.services.dbcl.getUser(userId);
                     const result = await createUserBillLink(user, bill, false);
                     console.log(result);

@@ -1138,16 +1138,18 @@ class userclass {
         } else {
           var response = [];
           result.forEach((user) => {
-            response.push({
-              id: user.id,
-              profileImage: user.profileImage,
-              userName: user.userName,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              address: user.address,
-              veteran: user.veteran,
-              homeless: user.homeless,
-            });
+            if (user.active === 'true') {
+              response.push({
+                id: user.id,
+                profileImage: user.profileImage,
+                userName: user.userName,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                address: user.address,
+                veteran: user.veteran,
+                homeless: user.homeless,
+              });  
+            }
           });
           return response;
         }
