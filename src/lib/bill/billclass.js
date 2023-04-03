@@ -176,12 +176,17 @@ class billClass {
       throw error;
     }
   }
-
+  
   async getMyBills(event) {
     try {
       var jwtDecode = await this.services.authcl.auth(event);
       var data = JSON.parse(event.body);
       var userBills = await this.services.dbcl.getUserBills(jwtDecode.id);
+      if (jwtDecode.role !== "admin") {
+        // security related issue - remove fields: payments, payment_method, subordinates, account_number, address
+        userBills = userBills.filter((ub) => ub.active == 'true')
+      }
+
       for (let i = 0; i < userBills.length; i++) {
         let ub = userBills[i];
         ub.repost = "false";
@@ -269,6 +274,7 @@ class billClass {
 
       if (jwtDecode.role !== "admin") {
         // security related issue - remove fields: payments, payment_method, subordinates, account_number, address
+        userBills = userBills.filter((ub) => ub.active == 'true')
         userBills.forEach((ub) => {
           delete ub.payments;
           delete ub.payment_method;
@@ -360,6 +366,72 @@ class billClass {
           if (bill.uid === jwtDecode.id) {
             transactions = await this.services.dbcl.getBillTransactions(
               bill.id
+            );
+          } else {
+            throw "Forbidden";
+          }
+        }
+
+        var payerSet = new Set();
+        var payerMap = new Map();
+        transactions.forEach((tr) => {
+          payerSet.add(tr.payerId);
+        });
+
+        var payerIds = Array.from(payerSet);
+        while (payerIds.length) {
+          let batchpayerIds = payerIds.splice(0, 25);
+          let payerUsers = await this.services.dbcl.getUsers(batchpayerIds);
+          payerUsers.forEach((pu) => {
+            payerMap.set(pu.id, pu);
+          });
+        }
+
+        transactions.forEach((tr) => {
+          let trPayer = payerMap.has(tr.payerId)
+            ? payerMap.get(tr.payerId)
+            : {
+                id: "undefined",
+                userName: "undefined",
+                firstName: "undefined",
+                lastName: "undefined",
+                profileImage: "undefined",
+                address: { city: "undefined", state: "undefined" },
+              };
+          tr.payerInfo = {
+            id: tr.payerId,
+            userName: trPayer.userName,
+            firstName: trPayer.firstName,
+            lastName: trPayer.lastName,
+            profileImage: trPayer.profileImage,
+            city: trPayer.address.city,
+            state: trPayer.address.state,
+          };
+        });
+
+        return transactions;
+      } else {
+        throw "InvalidPayload";
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getBillTransactionsByUserID(event) {
+    try {
+      var jwtDecode = await this.services.authcl.auth(event);
+      var data = JSON.parse(event.body);
+      if (data && data.id) {
+        var transactions = [];
+        var bill = await this.services.dbcl.getUserBillById(data.id);
+        if (jwtDecode.role && jwtDecode.role === "admin" && data.uid) {
+          transactions = await this.services.dbcl.getBillTransactionsByUserID(bill.id, data.uid);
+        } else {
+          if (bill.uid === jwtDecode.id) {
+            transactions = await this.services.dbcl.getBillTransactionsByUserID(
+              bill.id,
+              jwtDecode.id
             );
           } else {
             throw "Forbidden";
@@ -602,7 +674,7 @@ class billClass {
       var data = JSON.parse(event.body);
       if (data && data.billId) {
         if (jwtDecode.role && jwtDecode.role === "admin") {
-          user = await this.services.dbcl.getUser(jwtDecode.id);
+          user = await this.services.dbcl.getAdminUser(jwtDecode.id);
           let dbBill = await this.services.dbcl.getBillById(data.billId);
           // let dbBill = await this.services.dbcl.getBillById(data.billId);
           this.iconsole.log("dbBill::", dbBill);
@@ -936,6 +1008,10 @@ class billClass {
             throw "UserIsNotVerified";
           }
 
+          if (bill.active === "false") {
+            throw "Disabled bill";
+          }
+
           user.action = "pay";
           user.data = {
             billId: data.billId,
@@ -1073,6 +1149,9 @@ class billClass {
             data.billId
           );
 
+          if (bill.active === "false") {
+            throw "Disabled bill";
+          }
           let payMethod = "";
           const paymentMethods = bill.paymentMethods;
           if (

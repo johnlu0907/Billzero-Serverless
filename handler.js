@@ -362,6 +362,9 @@ module.exports.BillManage = async (event) => {
       } else if (fn == "update") {
         response.OK.body.payload = await billcl.updateBill(event);
         return response.success();
+      } else if (fn == "forceUpdate") {
+        response.OK.body.payload = await billcl.forceUpdateBill(event);
+        return response.success();
       } else if (fn == "pay") {
         response.OK.body.payload = await billcl.payBill(event);
         return response.success();
@@ -394,6 +397,9 @@ module.exports.BillManage = async (event) => {
         return response.success();
       } else if (fn == "getbilltransactions") {
         response.OK.body.payload = await billcl.getUserBillTransactions(event);
+        return response.success();
+      } else if (fn == "getbilltransactionsbyuserid") {
+        response.OK.body.payload = await billcl.getBillTransactionsByUserID(event);
         return response.success();
       } else if (fn == "getmybills") {
         response.OK.body.payload = await billcl.getMyBills(event);

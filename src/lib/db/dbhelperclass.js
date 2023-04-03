@@ -1601,6 +1601,30 @@ class dbHelperClass {
     }
   }
 
+  async getBillTransactionsByUserID(billId, uid) {
+    this.iconsole.log(billId, uid);
+    try {
+      var queryParams = {
+        TableName: this.transactionTable,
+        IndexName: this.billsTransactionsUpdatedAtIndex,
+        ScanIndexForward: false, // true = ascending, false = descending
+        KeyConditionExpression: "#billId = :billId",
+        FilterExpression: "#uid = :uid",
+        ExpressionAttributeNames: {
+          "#billId": "billId",
+          "#uid": "uid"
+        },
+        ExpressionAttributeValues: {
+          ":billId": billId,
+          ":uid": uid
+        },
+      };
+      let res = await this.queryTable(queryParams);
+      return res.Items;
+    } catch (error) {
+      throw error;
+    }
+  }
   // bills functions
 
   async getBillsByUidDueDate(uid, due_date = null, showUnpaid = true) {
