@@ -9,19 +9,62 @@ const CONTENT_TYPE = "application/json";
 const paymentFieldsCC = [
   {
     name: "Card Number",
-    stringValue: "4065 9400 6809 4797",
+    stringValue: "4065 9400 6345 3568",
   },
   {
     name: "Card Expiry MM",
-    stringValue: "01",
+    stringValue: "03",
   },
   {
     name: "Card Expiry YYYY",
-    stringValue: "2027",
+    stringValue: "2028",
   },
   {
     name: "CVV",
-    stringValue: "437",
+    stringValue: "569",
+  },
+  {
+    name: "Name on Card",
+    stringValue: "John Doe",
+  },
+  {
+    name: "Card Billing Address : Zip",
+    stringValue: "90021",
+  },
+  {
+    name: "Card Billing Address : Address Line1",
+    stringValue: "1250 long beach ave",
+  },
+  {
+    name: "Card Billing Address : Address Line2",
+    stringValue: "apt 226",
+  },
+  {
+    name: "Card Billing Address : City",
+    stringValue: "Los Angeles",
+  },
+  {
+    name: "Card Billing Address : State",
+    stringValue: "CA",
+  },
+];
+
+const paymentFieldsVCC = [
+  {
+    name: "Card Number",
+    stringValue: "4065 9400 6345 3568",
+  },
+  {
+    name: "Card Expiry MM",
+    stringValue: "03",
+  },
+  {
+    name: "Card Expiry YYYY",
+    stringValue: "2028",
+  },
+  {
+    name: "CVV",
+    stringValue: "569",
   },
   {
     name: "Name on Card",
@@ -238,6 +281,22 @@ class finoClass {
         .tz(process.env.DEFAULT_TIMEZONE)
         .format("YYYY-MM-DD"),
       paymentFields: paymentFieldsCC.concat(additionalFields),
+      callbackUrl: process.env.FINO_BILL_WEBHOOK_URL,
+    };
+    return this.post(
+      `/users/${userId}/paymentMethod/creditcard/directPayment`,
+      data
+    );
+  }
+  
+  directPaymentWithVCC(userId, payToAccountId, amount, additionalFields) {
+    const data = {
+      payToAccountId,
+      amount,
+      paymentDateInYYYYMMdd: moment()
+        .tz(process.env.DEFAULT_TIMEZONE)
+        .format("YYYY-MM-DD"),
+      paymentFields: paymentFieldsVCC.concat(additionalFields),
       callbackUrl: process.env.FINO_BILL_WEBHOOK_URL,
     };
     return this.post(

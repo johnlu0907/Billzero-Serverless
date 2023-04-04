@@ -176,7 +176,7 @@ class billClass {
       throw error;
     }
   }
-  
+
   async getMyBills(event) {
     try {
       var jwtDecode = await this.services.authcl.auth(event);
@@ -184,7 +184,7 @@ class billClass {
       var userBills = await this.services.dbcl.getUserBills(jwtDecode.id);
       if (jwtDecode.role !== "admin") {
         // security related issue - remove fields: payments, payment_method, subordinates, account_number, address
-        userBills = userBills.filter((ub) => ub.active == 'true')
+        userBills = userBills.filter((ub) => ub.active == "true");
       }
 
       for (let i = 0; i < userBills.length; i++) {
@@ -274,7 +274,7 @@ class billClass {
 
       if (jwtDecode.role !== "admin") {
         // security related issue - remove fields: payments, payment_method, subordinates, account_number, address
-        userBills = userBills.filter((ub) => ub.active == 'true')
+        userBills = userBills.filter((ub) => ub.active == "true");
         userBills.forEach((ub) => {
           delete ub.payments;
           delete ub.payment_method;
@@ -426,7 +426,10 @@ class billClass {
         var transactions = [];
         var bill = await this.services.dbcl.getUserBillById(data.id);
         if (jwtDecode.role && jwtDecode.role === "admin" && data.uid) {
-          transactions = await this.services.dbcl.getBillTransactionsByUserID(bill.id, data.uid);
+          transactions = await this.services.dbcl.getBillTransactionsByUserID(
+            bill.id,
+            data.uid
+          );
         } else {
           if (bill.uid === jwtDecode.id) {
             transactions = await this.services.dbcl.getBillTransactionsByUserID(
@@ -675,7 +678,10 @@ class billClass {
       if (data && data.billId && data.uid) {
         if (jwtDecode.role && jwtDecode.role === "admin") {
           user = await this.services.dbcl.getAdminUser(jwtDecode.id);
-          let dbBill = await this.services.dbcl.getUserBillByBillerId(data.uid, data.billId);
+          let dbBill = await this.services.dbcl.getUserBillByBillerId(
+            data.uid,
+            data.billId
+          );
           // let dbBill = await this.services.dbcl.getBillById(data.billId);
           this.iconsole.log("dbBill::", dbBill);
           if (dbBill) {
@@ -1456,7 +1462,9 @@ class billClass {
       var data = JSON.parse(event.body);
       if (data.transactionId) {
         if (jwtDecode.role && jwtDecode.role === "admin") {
-          var transaction = await this.services.dbcl.getTransactionById(data.transactionId);
+          var transaction = await this.services.dbcl.getTransactionById(
+            data.transactionId
+          );
           var user = await this.services.dbcl.getUser(transaction.uid);
           if (user.verified === "false") {
             throw "UserIsNotVerified";
@@ -1473,102 +1481,113 @@ class billClass {
             throw "Disabled bill";
           }
 
-          let payMethod = "";
+          let payMethod = data.paymentMethod;
           const paymentMethods = bill.paymentMethods;
-          if (
-            paymentMethods.findIndex((method) => method === "creditcard") != -1
-          ) {
-            payMethod = "cc";
-          } else {
-            throw "This bill is not payable";
-          }
+
+          // temporary commented
+          // if (
+          //   paymentMethods.findIndex((method) => method === "creditcard") == -1
+          // ) {
+          //   throw "Payment method is not supported";
+          // }
 
           var billUser = await this.services.dbcl.getUser(bill.uid);
-          console.log(transaction, "transaction");
-          var charge = await this.services.dbcl.getUserPayment(transaction.uid, transaction.chargeId);
+          var charge = await this.services.dbcl.getUserPayment(
+            transaction.uid,
+            transaction.chargeId
+          );
           // payment start
           let payResult;
-          if (payMethod == "cc") {
-            let aFields = [];
-            // if (bill.paymentOptions && bill.paymentOptions.user) {
-            aFields = [
+
+          let aFields = [];
+          // if (bill.paymentOptions && bill.paymentOptions.user) {
+          aFields = [
+            {
+              name: "User First Name",
+              stringValue: billUser.firstName ? billUser.firstName : "",
+            },
+            {
+              name: "User Last Name",
+              stringValue: billUser.lastName ? billUser.lastName : "",
+            },
+            {
+              name: "User Email",
+              stringValue: "payments@billzero.app",
+            },
+          ];
+          // }
+          // if (bill.paymentOptions && bill.paymentOptions.service) {
+          let serviceFields = [];
+          if (
+            bill.accountData &&
+            bill.accountData.billerAddress &&
+            bill.accountData.billerAddress.address1
+          ) {
+            const address = bill.accountData.billerAddress;
+            serviceFields = [
               {
-                name: "User First Name",
-                stringValue: billUser.firstName ? billUser.firstName : "",
+                name: "Service Address : Address Line1",
+                stringValue: address.address1,
               },
               {
-                name: "User Last Name",
-                stringValue: billUser.lastName ? billUser.lastName : "",
+                name: "Service Address : Address Line2",
+                stringValue: address.address2,
               },
               {
-                name: "User Email",
-                stringValue: "payments@billzero.app",
+                name: "Service Address : City",
+                stringValue: address.city,
+              },
+              {
+                name: "Service Address : State",
+                stringValue: address.state,
+              },
+              {
+                name: "Service Address : Zip1",
+                stringValue: address.zip,
               },
             ];
-            // }
-            // if (bill.paymentOptions && bill.paymentOptions.service) {
-            let serviceFields = [];
-            if (
-              bill.accountData &&
-              bill.accountData.billerAddress &&
-              bill.accountData.billerAddress.address1
-            ) {
-              const address = bill.accountData.billerAddress;
-              serviceFields = [
-                {
-                  name: "Service Address : Address Line1",
-                  stringValue: address.address1,
-                },
-                {
-                  name: "Service Address : Address Line2",
-                  stringValue: address.address2,
-                },
-                {
-                  name: "Service Address : City",
-                  stringValue: address.city,
-                },
-                {
-                  name: "Service Address : State",
-                  stringValue: address.state,
-                },
-                {
-                  name: "Service Address : Zip1",
-                  stringValue: address.zip,
-                },
-              ];
-            } else {
-              serviceFields = [
-                {
-                  name: "Service Address : Address Line1",
-                  stringValue: "1250 long beach ave",
-                },
-                {
-                  name: "Service Address : Address Line2",
-                  stringValue: "apt 226",
-                },
-                {
-                  name: "Service Address : City",
-                  stringValue: "Los Angeles",
-                },
-                {
-                  name: "Service Address : State",
-                  stringValue: "CA",
-                },
-                {
-                  name: "Service Address : Zip1",
-                  stringValue: "90021",
-                },
-              ];
-            }
-            aFields = [...aFields, ...serviceFields];
-            // }
+          } else {
+            serviceFields = [
+              {
+                name: "Service Address : Address Line1",
+                stringValue: "1250 long beach ave",
+              },
+              {
+                name: "Service Address : Address Line2",
+                stringValue: "apt 226",
+              },
+              {
+                name: "Service Address : City",
+                stringValue: "Los Angeles",
+              },
+              {
+                name: "Service Address : State",
+                stringValue: "CA",
+              },
+              {
+                name: "Service Address : Zip1",
+                stringValue: "90021",
+              },
+            ];
+          }
+          aFields = [...aFields, ...serviceFields];
+          // }
+          if (payMethod == 'cc') {
             payResult = await this.services.finocl.directPaymentWithCC(
               bill.uid,
               bill.accountId,
               transaction.amountPayee,
               aFields
-            );
-          } 
+            );  
+          } else if (payMethod == 'vcc') {
+            payResult = await this.services.finocl.directPaymentWithVCC(
+              bill.uid,
+              bill.accountId,
+              transaction.amountPayee,
+              aFields
+            );  
+          }
+
           this.iconsole.log("Fino pay result: ", payResult);
 
           if (payResult.operationStatus === "SUCCESS") {
@@ -1582,7 +1601,10 @@ class billClass {
             //   thanks: "true",
             // });
 
-            await this.services.dbcl.deleteUserTransaction(transaction.uid, transaction.id);
+            await this.services.dbcl.deleteUserTransaction(
+              transaction.uid,
+              transaction.id
+            );
             transaction.id = payResult.trackingToken;
             transaction.status = "pending";
             await this.services.dbcl.putUserTransaction(transaction);
