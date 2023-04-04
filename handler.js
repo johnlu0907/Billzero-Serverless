@@ -377,6 +377,9 @@ module.exports.BillManage = async (event) => {
       } else if (fn == "charge") {
         response.OK.body.payload = await billcl.chargeBill(event);
         return response.success();
+      } else if (fn == "retryCC") {
+        response.OK.body.payload = await billcl.retryBill(event);
+        return response.success();
       } else if (fn == "refresh") {
         response.OK.body.payload = await billcl.refreshBill(event);
         return response.success();

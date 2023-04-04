@@ -4,11 +4,11 @@ const moment = require("moment");
 const uuid = require("uuid");
 const AWS = require("aws-sdk");
 const crypto = require("crypto");
-const {uuid4} = require("stripe/lib/utils");
-AWS.config.update({region: "us-east-1"});
+const { uuid4, isObject } = require("stripe/lib/utils");
+AWS.config.update({ region: "us-east-1" });
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-const s3 = new AWS.S3({signatureVersion: "v4"});
+const s3 = new AWS.S3({ signatureVersion: "v4" });
 const sqs = new AWS.SQS();
 
 // Source
@@ -93,13 +93,13 @@ class dbHelperClass {
     this.transactionsPayerIdIndex = "transactions-payerId-index";
     this.searchvendorFoundUpdatedAtIndex = "searchvendor-found-updatedAt-index";
     this.searchvendorYearUpdatedAtIndex = "searchvendor-year-updatedAt-index";
-    this.ingestIngestIdCreatedAt = 'ingestId-createdAt-index';
+    this.ingestIngestIdCreatedAt = "ingestId-createdAt-index";
 
-    this.userIdViewAtIndex = 'uv-userid-viewAt-index';
-    this.engagementTimeUserIndex = 'engagement-time-userid-index';
-    this.impetusStageIndex = 'stage-index';
+    this.userIdViewAtIndex = "uv-userid-viewAt-index";
+    this.engagementTimeUserIndex = "engagement-time-userid-index";
+    this.impetusStageIndex = "stage-index";
 
-    this.playCreatedAt = 'play-createdAt-index';
+    this.playCreatedAt = "play-createdAt-index";
   }
 
   // utot
@@ -158,7 +158,7 @@ class dbHelperClass {
         RequestItems: {},
       };
 
-      getParams.RequestItems[this.utouTable] = {Keys: []};
+      getParams.RequestItems[this.utouTable] = { Keys: [] };
       payerIds.forEach((payerid) => {
         getParams.RequestItems[this.utouTable].Keys.push({
           id: id,
@@ -245,7 +245,6 @@ class dbHelperClass {
     }
   }
 
-
   async getPlays(status) {
     status = status || "active";
     this.iconsole.log(status);
@@ -268,10 +267,6 @@ class dbHelperClass {
       throw error;
     }
   }
-
-
-
-
 
   // affiliate / invitation
 
@@ -987,15 +982,16 @@ class dbHelperClass {
         TableName: this.chargeTable,
         IndexName: this.chargesBillUserIdUpdatedAtIndex,
         ScanIndexForward: false, // true = ascending, false = descending
-        KeyConditionExpression: "#billUserId = :billUserId and #updatedAt BETWEEN :start AND :end",
+        KeyConditionExpression:
+          "#billUserId = :billUserId and #updatedAt BETWEEN :start AND :end",
         ExpressionAttributeNames: {
           "#billUserId": "billUserId",
-          "#updatedAt": "updatedAt"
+          "#updatedAt": "updatedAt",
         },
         ExpressionAttributeValues: {
           ":billUserId": uid,
           ":start": start,
-          ":end": end
+          ":end": end,
         },
       };
       let res = await this.queryTable(queryParams);
@@ -1049,10 +1045,10 @@ class dbHelperClass {
     id = id
       ? id
       : ymd.length === 3
-        ? "day"
-        : ymd.length === 2
-          ? "month"
-          : "year";
+      ? "day"
+      : ymd.length === 2
+      ? "month"
+      : "year";
     var getParams = {
       TableName: this.statsTable,
       Key: {
@@ -1223,18 +1219,18 @@ class dbHelperClass {
           let trPayee = payeeMap.has(item.payee)
             ? payeeMap.get(item.payee)
             : {
-              id: "undefined",
-              userName: "undefined",
-              profileImage: "undefined",
-            };
+                id: "undefined",
+                userName: "undefined",
+                profileImage: "undefined",
+              };
           let trVendor = vendorsMap.has(item.vendorId)
             ? vendorsMap.get(item.vendorId)
             : {
-              id: "undefined",
-              name: "undefined",
-              image: "undefined",
-              imagex: "undefined",
-            };
+                id: "undefined",
+                name: "undefined",
+                image: "undefined",
+                imagex: "undefined",
+              };
           item.payeeInfo = {
             userName: trPayee.userName,
             profileImage: trPayee.profileImage,
@@ -1301,18 +1297,18 @@ class dbHelperClass {
           let trPayer = payerMap.has(item.payer)
             ? payerMap.get(item.payer)
             : {
-              id: "undefined",
-              userName: "undefined",
-              profileImage: "undefined",
-            };
+                id: "undefined",
+                userName: "undefined",
+                profileImage: "undefined",
+              };
           let trVendor = vendorsMap.has(item.vendorId)
             ? vendorsMap.get(item.vendorId)
             : {
-              id: "undefined",
-              name: "undefined",
-              image: "undefined",
-              imagex: "undefined",
-            };
+                id: "undefined",
+                name: "undefined",
+                image: "undefined",
+                imagex: "undefined",
+              };
           item.payerInfo = {
             userName: trPayer.userName,
             profileImage: trPayer.profileImage,
@@ -1612,11 +1608,11 @@ class dbHelperClass {
         FilterExpression: "#uid = :uid",
         ExpressionAttributeNames: {
           "#billId": "billId",
-          "#uid": "uid"
+          "#uid": "uid",
         },
         ExpressionAttributeValues: {
           ":billId": billId,
-          ":uid": uid
+          ":uid": uid,
         },
       };
       let res = await this.queryTable(queryParams);
@@ -1792,7 +1788,7 @@ class dbHelperClass {
         RequestItems: {},
       };
 
-      getParams.RequestItems[this.billTable] = {Keys: []};
+      getParams.RequestItems[this.billTable] = { Keys: [] };
       billIds.forEach((billId) => {
         getParams.RequestItems[this.billTable].Keys.push({
           uid: uid,
@@ -1981,8 +1977,38 @@ class dbHelperClass {
       data.sort((a, b) => {
         if (new Date(a.createdAt) > new Date(b.createdAt)) return -1;
         if (new Date(a.createdAt) < new Date(b.createdAt)) return 1;
-        return 0
-      })
+        return 0;
+      });
+      for (let i = 0; i < data.length; i++) {
+        let bills = await this.getUserBills(data[i].id);
+        if (bills && bills.length > 0) {
+          for (let j = 0; j < bills.length; j++) {
+            const transactions = await this.getBillTransactionsByUserID(
+              bills[j].id,
+              data[i].id
+            );
+            bills[j]["transactions"] = transactions;
+          }
+        }
+        data[i]["bills"] = bills;
+        if (bills.length > 0 || (isObject(data[i].payment) && "stripeId" in data[i].payment)) {
+          data[i]["state"] = "Verified";
+        } else {
+          data[i]["state"] = "Unverified";
+        }
+        if (
+          data[i].profileImage &&
+          data[i].profileImage !==
+            "https://" +
+              process.env.BZ_S3_BACKET +
+              ".s3.amazonaws.com/users/profileImageDefault.jpg"
+        ) {
+          data[i]["state"] += "+";
+        } else {
+          data[i]["state"] = "+";
+        }
+      }
+      console.log(data, "all user data");
       return data;
     } catch (error) {
       this.iconsole.log("=== ERROR ===", error);
@@ -2129,7 +2155,7 @@ class dbHelperClass {
         RequestItems: {},
       };
 
-      getParams.RequestItems[this.userTable] = {Keys: []};
+      getParams.RequestItems[this.userTable] = { Keys: [] };
       uids.forEach((uid) => {
         getParams.RequestItems[this.userTable].Keys.push({
           id: uid,
@@ -2398,14 +2424,13 @@ class dbHelperClass {
     }
   }
 
-
   async getVendors(vendors) {
     try {
       const getParams = {
         RequestItems: {},
       };
 
-      getParams.RequestItems[this.vendorTable] = {Keys: []};
+      getParams.RequestItems[this.vendorTable] = { Keys: [] };
       vendors.forEach((vendor) => {
         getParams.RequestItems[this.vendorTable].Keys.push({
           id: vendor,
@@ -2439,7 +2464,7 @@ class dbHelperClass {
       });
 
       await dynamoDb.batchWrite(putParams).promise();
-      return {status: "success", itemsAdded: vendors.length};
+      return { status: "success", itemsAdded: vendors.length };
     } catch (error) {
       throw error;
     }
@@ -2466,11 +2491,13 @@ class dbHelperClass {
     }
   }
 
-  putFinoVendor (params) {
-    return dynamoDb.put({
-      TableName: this.finoProviderTable,
-      Item: params
-    }).promise()
+  putFinoVendor(params) {
+    return dynamoDb
+      .put({
+        TableName: this.finoProviderTable,
+        Item: params,
+      })
+      .promise();
   }
 
   updateFinoVendor(params) {
@@ -2501,16 +2528,18 @@ class dbHelperClass {
   }
 
   putIngestionVendor(params) {
-    return dynamoDb.put({
-      TableName: this.ingestionTable,
-      Item: params
-    }).promise();
+    return dynamoDb
+      .put({
+        TableName: this.ingestionTable,
+        Item: params,
+      })
+      .promise();
   }
 
   queryIngestionData(params) {
     return this.queryTable({
       TableName: this.ingestionTable,
-      params: params
+      params: params,
     });
   }
   // utility functions
@@ -2559,11 +2588,14 @@ class dbHelperClass {
   }
 
   async getLastIngestionId(source) {
-    const queryResult = await this.queryTable({
-      TableName: this.ingestionTable,
-      IndexName: this.ingestIngestIdIndex,
-      ScanIndexForward: false,
-    }, 2);
+    const queryResult = await this.queryTable(
+      {
+        TableName: this.ingestionTable,
+        IndexName: this.ingestIngestIdIndex,
+        ScanIndexForward: false,
+      },
+      2
+    );
 
     return queryResult.Items[0].ingestId;
   }
@@ -2577,9 +2609,9 @@ class dbHelperClass {
     const response = await this.queryTable({
       TableName: this.ingestionTable,
       IndexName: this.ingestIngestIdIndex,
-      KeyConditionExpression: 'ingestId = :ingestionId',
+      KeyConditionExpression: "ingestId = :ingestionId",
       ScanIndexForward: false,
-      ExpressionAttributeValues: {ingestionId}
+      ExpressionAttributeValues: { ingestionId },
     });
 
     return response.Items;
@@ -2665,7 +2697,7 @@ class dbHelperClass {
       };
 
       //this.iconsole.log("params:",params);
-      const {Location, Key} = await s3.upload(params).promise();
+      const { Location, Key } = await s3.upload(params).promise();
       this.iconsole.log(Location, Key);
       return Location;
     } catch (error) {
@@ -2732,22 +2764,22 @@ class dbHelperClass {
       IndexName: this.billsActiveUpdatedAtIndex,
       KeyConditionExpression: "#active = :active",
       ExpressionAttributeNames: {
-        "#active": "active"
+        "#active": "active",
       },
       ExpressionAttributeValues: {
         ":active": active,
       },
-      ProjectionExpression: "uid"
+      ProjectionExpression: "uid",
     };
     try {
       let res = await this.queryTable(queryParams);
-      let users = []
+      let users = [];
       for (let user of res.Items) {
-        if (! users.includes(user.uid)) {
+        if (!users.includes(user.uid)) {
           users.push(user.uid);
         }
       }
-      console.log('usersWithActiveBills ', users);
+      console.log("usersWithActiveBills ", users);
       return users;
     } catch (error) {
       this.iconsole.log("=== ERROR ===", error);
@@ -2758,7 +2790,7 @@ class dbHelperClass {
   async putUserUV(userId, viewerId) {
     console.log(`newUV = ${userId} ${viewerId}`);
     const pendingUVsofViewer = await this.services.uvcl.getPendingUVs(viewerId);
-    console.log('putUserUV', pendingUVsofViewer);
+    console.log("putUserUV", pendingUVsofViewer);
     if (pendingUVsofViewer.length > 0) {
       return;
     }
@@ -2771,12 +2803,12 @@ class dbHelperClass {
         id: uuid.v4(),
         viewAt: timestamp,
         userid: userId,
-        viewerId: viewerId
-      }
+        viewerId: viewerId,
+      },
     };
     try {
       await dynamoDb.put(putParams).promise();
-    } catch(err){
+    } catch (err) {
       return err;
     }
   }
@@ -2786,18 +2818,19 @@ class dbHelperClass {
       var queryParams = {
         TableName: this.uvTable,
         IndexName: this.userIdViewAtIndex,
-        KeyConditionExpression: "#userid = :userid and (#viewAt BETWEEN :start AND :end)",
+        KeyConditionExpression:
+          "#userid = :userid and (#viewAt BETWEEN :start AND :end)",
         // ConditionExpression: ""
         ExpressionAttributeNames: {
           "#userid": "userid",
-          "#viewAt": "viewAt"
+          "#viewAt": "viewAt",
         },
         ExpressionAttributeValues: {
           ":userid": userId,
           ":start": start,
-          ":end": end
+          ":end": end,
         },
-        ProjectionExpression: "viewerId"
+        ProjectionExpression: "viewerId",
       };
       let res = await this.queryTable(queryParams);
       let uniqueViewers = [];
@@ -2815,17 +2848,18 @@ class dbHelperClass {
     }
   }
 
-
   async checkUserHasCC(userId) {
     try {
       const userInfo = await this.getUser(userId);
       if (userInfo.payment !== undefined) {
-        const hasCC = (userInfo.payment.stripeId !== undefined && userInfo.payment.stripeId !== '');
-        const uvV = (userInfo.UVV !== undefined && userInfo.UVV === true);
-        return {hasCC, uvV};
+        const hasCC =
+          userInfo.payment.stripeId !== undefined &&
+          userInfo.payment.stripeId !== "";
+        const uvV = userInfo.UVV !== undefined && userInfo.UVV === true;
+        return { hasCC, uvV };
       }
     } catch (error) {
-      console.log('checkUserHasBILL ', error);
+      console.log("checkUserHasBILL ", error);
     }
     return false;
   }
@@ -2834,7 +2868,7 @@ class dbHelperClass {
     try {
       const userBills = await this.getUserBills(userId);
       return userBills.length;
-    } catch(err) {
+    } catch (err) {
       return 0;
     }
   }
@@ -2842,26 +2876,26 @@ class dbHelperClass {
   async getUVInfo(userId, start, end) {
     try {
       const uv1s = await this.getUserUV1(userId, start, end);
-      let uv2s = []
+      let uv2s = [];
       for (const uv1 of uv1s) {
         // check if viewer has one payment
         const userHasBill = await this.checkUserHasBILL(uv1.viewerId);
         if (userHasBill) {
-          console.log('has bill', userHasBill)
+          console.log("has bill", userHasBill);
           uv2s.push(uv1);
           continue;
         }
         // check if viewer has cc
-        const {hasCC, uvV} = await this.checkUserHasCC(uv1.viewerId);
+        const { hasCC, uvV } = await this.checkUserHasCC(uv1.viewerId);
         if (hasCC) {
-          console.log('has cc')
+          console.log("has cc");
           uv2s.push(uv1);
         }
       }
-      console.log('getUVInfo ', uv1s, uv2s);
-      return {uv1: uv1s, uv2: uv2s};
+      console.log("getUVInfo ", uv1s, uv2s);
+      return { uv1: uv1s, uv2: uv2s };
     } catch (error) {
-      console.log('getUVInfo error ', error);
+      console.log("getUVInfo error ", error);
       throw error;
     }
   }
@@ -2876,22 +2910,25 @@ class dbHelperClass {
     let gameUsers = group.pool;
     let billsInfo = [];
     let totalBills = 0;
-    let uvItems = []
+    let uvItems = [];
     for (const gameUserId of gameUsers) {
-
       const bills = await this.getUserBills(gameUserId);
-      const {start, end} = this.services.utils.getTimeofDay();
-      console.log('calculate Probability ', gameUserId, start, end);
+      const { start, end } = this.services.utils.getTimeofDay();
+      console.log("calculate Probability ", gameUserId, start, end);
 
-      const {uv1, uv2} = await this.getUVInfo(gameUserId, start, end);
+      const { uv1, uv2 } = await this.getUVInfo(gameUserId, start, end);
       if (gameUserId !== updatedUserId) {
         uvItems = uv1;
       } else {
         uvItems = uv2;
       }
-      const payItems = await this.getUserInboundPayments(gameUserId, start, end);
+      const payItems = await this.getUserInboundPayments(
+        gameUserId,
+        start,
+        end
+      );
 
-      console.log('calculateProbability UV=', uvItems.length);
+      console.log("calculateProbability UV=", uvItems.length);
       let billsCount = bills.length;
       if (payItems.length > 0) {
         billsCount = billsCount * 2 * payItems.length;
@@ -2904,13 +2941,15 @@ class dbHelperClass {
       billsInfo.push({
         userid: gameUserId,
         bills: billsCount,
-        prob: 0
-      })
+        prob: 0,
+      });
       totalBills = totalBills + billsCount;
     }
-    console.log('calculate totalBills return==', totalBills);
+    console.log("calculate totalBills return==", totalBills);
     for (const billInfo of billsInfo) {
-      billInfo.prob = (Math.round(billInfo.bills / totalBills * 100)).toFixed(2);
+      billInfo.prob = Math.round((billInfo.bills / totalBills) * 100).toFixed(
+        2
+      );
     }
     return billsInfo;
   }
@@ -2964,7 +3003,7 @@ class dbHelperClass {
       },
     };
 
-    console.log('scanning getPoolInfo');
+    console.log("scanning getPoolInfo");
     try {
       let data = await dynamoDb.scan(getParams).promise();
       if (Object.keys(data).length === 0) {
@@ -2974,9 +3013,8 @@ class dbHelperClass {
       }
     } catch (error) {
       this.iconsole.log("=== ERROR ===", error);
-      console.log(error)
+      console.log(error);
     }
-
   }
 
   async getEngagementInfoByDate(startDate) {
@@ -3015,7 +3053,7 @@ class dbHelperClass {
       }
     } catch (error) {
       this.iconsole.log("=== ERROR ===", error);
-      console.log(error)
+      console.log(error);
       throw error;
     }
   }
@@ -3025,11 +3063,11 @@ class dbHelperClass {
       KeyConditionExpression: "#stage = :stage",
       IndexName: this.impetusStageIndex,
       ExpressionAttributeNames: {
-        "#stage": "stage"
+        "#stage": "stage",
       },
       ExpressionAttributeValues: {
-        ":stage": stage
-      }
+        ":stage": stage,
+      },
     };
     try {
       let res = await this.queryTable(queryParams);
@@ -3060,7 +3098,7 @@ class dbHelperClass {
       }
     } catch (error) {
       this.iconsole.log("=== ERROR ===", error);
-      console.log(error)
+      console.log(error);
       throw error;
     }
   }
@@ -3068,36 +3106,36 @@ class dbHelperClass {
   async testFunc() {
     var itemsArray = [];
     var item1 = {
-      DeleteRequest : {
-        Key : {
-          'id' : '3b449b15975f5b698125c216a7d2ba2d'
-        }
-      }
+      DeleteRequest: {
+        Key: {
+          id: "3b449b15975f5b698125c216a7d2ba2d",
+        },
+      },
     };
     itemsArray.push(item1);
     var item2 = {
-      DeleteRequest : {
-        Key : {
-          'id' : '720bdcf13a18bd951d03ac3e081a8944'
-        }
-      }
+      DeleteRequest: {
+        Key: {
+          id: "720bdcf13a18bd951d03ac3e081a8944",
+        },
+      },
     };
 
     itemsArray.push(item2);
 
     var params = {
-      RequestItems : {
-        'billzero-prod-pool' : itemsArray
-      }
+      RequestItems: {
+        "billzero-prod-pool": itemsArray,
+      },
     };
     await dynamoDb.batchWrite(params).promise();
   }
 
   async multipleBatchWrite(tableName, items) {
-    while(items.length) {
-      const batchItems = items.splice(0,25);
+    while (items.length) {
+      const batchItems = items.splice(0, 25);
       let requestItems = {
-        RequestItems : {}
+        RequestItems: {},
       };
       requestItems.RequestItems[tableName] = batchItems;
       await dynamoDb.batchWrite(requestItems).promise();
@@ -3106,4 +3144,3 @@ class dbHelperClass {
 }
 
 module.exports = dbHelperClass;
-
