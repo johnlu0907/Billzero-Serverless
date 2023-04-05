@@ -1273,23 +1273,7 @@ class adminClass {
       throw error;
     }
   }
-
-  // due to API gateway 30 sec limitation this function is useless, think how to bypass
-  async updateVendors(event) {
-    try {
-      var jwtDecode = await this.services.authcl.auth(event);
-      if (jwtDecode.role && jwtDecode.role === "admin") {
-        var data = JSON.parse(event.body);
-        var startPage = data && data.startPage ? parseInt(data.startPage) : 1;
-        return await this.services.arcuscl.updateBillersDatabase(startPage);
-      } else {
-        throw "Forbidden";
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-
+ 
   // Admin Testing functions
 
   async applyTestContentToUser(event) {

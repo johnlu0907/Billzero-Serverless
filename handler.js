@@ -13,9 +13,6 @@ const supportClass = require('./src/lib/support/supportclass');
 
 const finoClass = require('./src/lib/payment/finoclass');
 const finov4Class = require('./src/lib/payment/finov4class');
-
-const arcusClass = require('./src/lib/payment/arcusclass');
-//const billcomClass = require('./src/lib/payment/billcomclass');
 const stripeClass = require('./src/lib/payment/stripeclass');
 const userclass = require('./src/lib/user/userclass');
 const adminClass = require('./src/lib/admin/adminclass');
@@ -41,8 +38,6 @@ const supportcl = new supportClass({iconsole, services});
 const finocl = new finoClass({iconsole, services});
 const finov4cl = new finov4Class({iconsole, services});
 
-const arcuscl = new arcusClass({iconsole, services});
-//const billcomcl = new billcomClass({ iconsole, services}); 
 const stripecl = new stripeClass({iconsole, services});
 const usercl = new userclass({iconsole, services});
 const admincl = new adminClass({iconsole, services});
@@ -743,11 +738,3 @@ module.exports.processCycle = async (event, context) => {
   }
   return `Successfully processed ${event.Records.length} records.`;
 };
-
-// due to API gateway 30 sec limitation this function is useless, think how to bypass
-/* module.exports.cronUpdateArcusVendors = (event, context) => {
-  const time = new Date();
-  let res = await arcuscl.updateBillersDatabase(); 
-  console.log(`Your cron function "${context.functionName}" run at ${time}`);
-  console.log("job result::",res);
-}; */

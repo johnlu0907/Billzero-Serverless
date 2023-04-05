@@ -1388,7 +1388,6 @@ class userclass {
                 };
               } else {
                 try {
-                  // let sqsResponse = await this.services.billcl.postToArcusSQS(billerdata);
                   await this.services.billcl.putEmptyBill(user.id, vendorId);
                   let sqsResponse = await this.services.billcl.postToFinoSQS(
                     billerdata

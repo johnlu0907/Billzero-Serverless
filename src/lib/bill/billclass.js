@@ -82,48 +82,6 @@ class billClass {
     }
   }
 
-  // for testing, manual linking
-  async xDataLinkWithXPay(vendorId, account_number) {
-    try {
-      var vendor = await this.services.dbcl.getVendor(vendorId);
-      vendor.xPayBillerIds =
-        vendor.xPayBillerIds && Array.isArray(vendor.xPayBillerIds)
-          ? vendor.xPayBillerIds
-          : [];
-      if (!vendor.xPayBillerIds.length) {
-        var xPayRppsBiller = await this.services.arcuscl.xpayBillerFind({
-          vendor: vendor,
-          account_number: account_number,
-        });
-        if (xPayRppsBiller) {
-          this.iconsole.log("1.Found xPay biller:", xPayRppsBiller);
-          if (
-            !vendor.xPayBillerIds.find((item) => item === xPayRppsBiller.id)
-          ) {
-            vendor.xPayBillerIds.push(xPayRppsBiller.id);
-            this.iconsole.log(
-              "2.Found xPay biller adding to list:",
-              xPayRppsBiller
-            );
-            await this.services.dbcl.putVendor(vendor);
-          } else {
-            this.iconsole.log(
-              "3.Found xPay biller, already in list:",
-              xPayRppsBiller
-            );
-          }
-        } else {
-          this.iconsole.log("4.Could not find xPay biller");
-          throw "Could not find xPay biller";
-        }
-      }
-
-      return vendor;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   async getBillTransactions(bill) {
     try {
       bill.payers = [];
@@ -590,14 +548,6 @@ class billClass {
           error: error,
         },
       });
-      throw error;
-    }
-  }
-
-  async postToArcusSQS(data) {
-    try {
-      return this.services.dbcl.sqsSendMessage(process.env.ARCUS_SQS_URL, data);
-    } catch (error) {
       throw error;
     }
   }
@@ -1727,28 +1677,12 @@ class billClass {
         this.iconsole.log("invoice.payment_succeeded::::", data);
         var metadata = data.metadata;
 
-        // create Arcus transaction here
-        //var plan = await this.services.stripecl.retrievePlan(metadata.planId);
-
         var bill = await this.services.dbcl.getUserBillByBillerId(
           metadata.billUserId,
           metadata.billId
         );
         var billUser = await this.services.dbcl.getUser(bill.uid);
         var user = await this.services.dbcl.getUser(metadata.uid);
-
-        // let diff = moment().diff(moment(new Date(bill.due_date)),'days');
-        // if (diff > 0) {
-        //   let billerdata = {
-        //     bzFunc : "refreshBill",
-        //     billId : bill.id,
-        //     external_user_id : billUser.id,
-        //     biller_id : bill.billerId
-        //   }
-
-        //   var sqsResponse = await this.postToArcusSQS(billerdata);
-        //   this.iconsole.log("sqsResponse:",sqsResponse);
-        // }
 
         var chargeResult = await this.processBillSubscription(
           data.subscription,
