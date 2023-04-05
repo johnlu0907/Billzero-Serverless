@@ -1138,7 +1138,7 @@ class userclass {
         } else {
           var response = [];
           result.forEach((user) => {
-            if (user.active === 'true') {
+            if (user.active === "true") {
               response.push({
                 id: user.id,
                 profileImage: user.profileImage,
@@ -1148,7 +1148,7 @@ class userclass {
                 address: user.address,
                 veteran: user.veteran,
                 homeless: user.homeless,
-              });  
+              });
             }
           });
           return response;
@@ -1504,7 +1504,6 @@ class userclass {
         //       data.fileName
         //     );
 
-
         var presignedUrl = await this.services.dbcl.createAwsS3PutPresignedUrl(
           path,
           3000
@@ -1515,35 +1514,30 @@ class userclass {
           imageUrl: imageUrl,
           presignedUrlTTL: 3000,
         };
-        
       } else {
         throw "InvalidPayload";
       }
     } catch (error) {
       throw error;
     }
-    
   }
 
   async AwsS3PictureDeletion(event) {
-
     try {
       var jwtDecode = await this.services.authcl.auth(event);
       var data = JSON.parse(event.body);
-      var s3Bucket = data.bucketParams.Bucket
-      var s3Key = data.bucketParams.Key
+      var s3Bucket = data.bucketParams.Bucket;
+      var s3Key = data.bucketParams.Key;
       // Delete the object.
       // console.log(`\nDeleting object "${bucketParams.Key}"} from bucket`);
       var deletePicture = await s3Client.send(
         new DeleteObjectCommand({ Bucket: s3Bucket, Key: s3Key })
       );
-      return deletePicture
+      return deletePicture;
     } catch (err) {
       console.log("Error deleting object", err);
-      return err
+      return err;
     }
-
-
   }
 
   async getUserSupportTickets(event) {
@@ -1636,19 +1630,26 @@ class userclass {
   async checkUserUVVirgin(userId) {
     try {
       const userInfo = await this.services.dbcl.getUser(userId);
-      const uvV = (userInfo.UVV !== undefined && userInfo.UVV !== '');
+      const uvV = userInfo.UVV !== undefined && userInfo.UVV !== "";
       if (uvV) {
-        return {uvV: true, needUpdate: false};
+        return { uvV: true, needUpdate: false };
       }
       //has cc, update UVV = true
-      const hasCC = (userInfo.payment.stripeId !== undefined && userInfo.payment.stripeId !== '');
+      const hasCC =
+        userInfo.payment.stripeId !== undefined &&
+        userInfo.payment.stripeId !== "";
       const userBills = await this.services.dbcl.getUserBills(userId);
       if (hasCC || userBills.length > 0) {
-        return {uvV: true, cc: hasCC, bills: userBills.length, needUpdate: true}
+        return {
+          uvV: true,
+          cc: hasCC,
+          bills: userBills.length,
+          needUpdate: true,
+        };
       }
-      return {uvV: false, needUpdate: false}
+      return { uvV: false, needUpdate: false };
     } catch (error) {
-      console.log('checkUserHasBILL ', error);
+      console.log("checkUserHasBILL ", error);
     }
     return false;
   }
@@ -1662,28 +1663,6 @@ class userclass {
   //   }
   //
   // }
-
-
-
-  // ---------------------------------------------------------------------------
-  async getn8(event) {
-    try {
-      var jwtDecode = await this.services.authcl.auth(event);
-
-      //get data
-      let data = await this.services.dbcl.getAdminSettings("pp");
-
-
-
-
-      return {
-        body: data.settings.body,
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-  // ---------------------------------------------------------------------------
 }
 
 module.exports = userclass;

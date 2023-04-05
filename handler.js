@@ -212,9 +212,6 @@ module.exports.AdminManage = async (event) => {
       } else if (fn === "testFunc") {
         response.OK.body.payload = await admincl.testFunc(event);
         return response.success();
-      } else if (fn === "getn8static") {
-        response.OK.headers['Content-Type'] = 'text/xml';
-        return response.success("<Response><Message>static response</Message></Response>");
       } else if (fn === "setpotrate") {
         response.OK.body.payload = await admincl.setPotRate(event);
         return response.success();
@@ -334,9 +331,6 @@ module.exports.UserManage = async (event) => {
         return response.success();
       } else if (fn == "pp") {
         response.OK.body.payload = await usercl.getPrivacyPolicy(event);
-        return response.success();
-      } else if (fn == "n8") {
-        response.OK.body.payload = await usercl.getn8(event);
         return response.success();
       } else {
         return response.fail("BadRequest");
