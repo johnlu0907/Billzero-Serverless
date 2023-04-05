@@ -1,8 +1,10 @@
 node_modules
 *.un~
 .bak
+*.bak
 .*~
 .json~
 .serverless
 yarn.lock
 package-lock.json
+.idea
