@@ -182,7 +182,7 @@ class messagingClass {
 
   async notifyUser(id, message, data = null) {
     try {
-      const filteredNumbers = ['6027952289', '2342218202', '5304752777'];
+      const filteredNumbers = ['6027952289', '2342218202', '5304752777', '3343283680', '7608842275'];
 
       this.iconsole.log(id, message);
       let user = await this.services.dbcl.getUser(id);

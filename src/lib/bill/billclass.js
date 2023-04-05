@@ -182,10 +182,10 @@ class billClass {
       var jwtDecode = await this.services.authcl.auth(event);
       var data = JSON.parse(event.body);
       var userBills = await this.services.dbcl.getUserBills(jwtDecode.id);
-      if (jwtDecode.role !== "admin") {
-        // security related issue - remove fields: payments, payment_method, subordinates, account_number, address
-        userBills = userBills.filter((ub) => ub.active == "true");
-      }
+      // if (jwtDecode.role !== "admin") {
+      //   // security related issue - remove fields: payments, payment_method, subordinates, account_number, address
+      //   userBills = userBills.filter((ub) => ub.active == "true");
+      // }
 
       for (let i = 0; i < userBills.length; i++) {
         let ub = userBills[i];
@@ -731,8 +731,13 @@ class billClass {
         if (jwtDecode.id === process.env.DEFAULTUSERID) {
           throw "Forbidden";
         } else {
-          var user = await this.services.dbcl.getUser(jwtDecode.id);
-
+          var user;
+          if (jwtDecode.role && jwtDecode.role === 'admin') {
+            user = await this.services.dbcl.getUser(data.uid); 
+          } else {
+            user = await this.services.dbcl.getUser(jwtDecode.id);
+          }
+          
           if (user.verified === "false") {
             throw "UserIsNotVerified";
           }
@@ -781,18 +786,18 @@ class billClass {
             // bill.status = "refresh";
             // this.services.dbcl.putUserBill(bill);
 
-            // let billerdata = {
-            //   bzFunc : "refreshBill",
-            //   user_id : user.id,
-            //   account_id: bill.providerAccountId
-            // };
+            let billerdata = {
+              bzFunc : "refreshBill",
+              user_id : user.id,
+              account_id: bill.providerAccountId
+            };
 
-            // var sqsResponse = await this.postToFinoSQS(billerdata);
-            // this.iconsole.log("sqsResponse:",sqsResponse);
-            // return {
-            //   status:"bill_processing",
-            //   bill:bill
-            // }
+            var sqsResponse = await this.postToFinoSQS(billerdata);
+            this.iconsole.log("sqsResponse:",sqsResponse);
+            return {
+              status:"bill_processing",
+              bill:bill
+            }
           }
         }
       } else {

@@ -1979,36 +1979,6 @@ class dbHelperClass {
         if (new Date(a.createdAt) < new Date(b.createdAt)) return 1;
         return 0;
       });
-      for (let i = 0; i < data.length; i++) {
-        let bills = await this.getUserBills(data[i].id);
-        if (bills && bills.length > 0) {
-          for (let j = 0; j < bills.length; j++) {
-            const transactions = await this.getBillTransactionsByUserID(
-              bills[j].id,
-              data[i].id
-            );
-            bills[j]["transactions"] = transactions;
-          }
-        }
-        data[i]["bills"] = bills;
-        if (bills.length > 0 || (isObject(data[i].payment) && "stripeId" in data[i].payment)) {
-          data[i]["state"] = "Verified";
-        } else {
-          data[i]["state"] = "Unverified";
-        }
-        if (
-          data[i].profileImage &&
-          data[i].profileImage !==
-            "https://" +
-              process.env.BZ_S3_BACKET +
-              ".s3.amazonaws.com/users/profileImageDefault.jpg"
-        ) {
-          data[i]["state"] += "+";
-        } else {
-          data[i]["state"] = "+";
-        }
-      }
-      console.log(data, "all user data");
       return data;
     } catch (error) {
       this.iconsole.log("=== ERROR ===", error);
