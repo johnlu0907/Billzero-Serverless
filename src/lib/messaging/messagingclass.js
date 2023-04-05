@@ -63,10 +63,11 @@ class messagingClass {
   async sendSMS(to, message, from) {
     try {
       try {
+        const prefix = "BillZero | ";
         from = from ? from : process.env.TWILIOPHONE;
         this.iconsole.log({to: to, message: message, from: from});
         var message = await twiliocl.messages.create({
-          body: message,
+          body: prefix + message,
           to: to,
           from: from,
         });
