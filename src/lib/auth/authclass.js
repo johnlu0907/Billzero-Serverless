@@ -86,15 +86,17 @@ class authclass {
     this.iconsole.log();
     try {
       if (event.headers[process.env.JWTHDRPARAM]) {
-        const jwtDecode = await this.verify(event.headers[process.env.JWTHDRPARAM]);
-        console.log(jwtDecode, "jwt Decode")
+        const jwtDecode = await this.verify(
+          event.headers[process.env.JWTHDRPARAM]
+        );
+        console.log(jwtDecode, "jwt Decode");
         if (jwtDecode.role && jwtDecode.role !== "admin") {
           const user = await this.services.dbcl.getUser(jwtDecode.id);
-          if (user.active === 'false') {
+          if (user.active === "false") {
             throw "Disabled";
           } else {
             return jwtDecode;
-          }            
+          }
         } else {
           return jwtDecode;
         }

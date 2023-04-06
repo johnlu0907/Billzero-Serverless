@@ -682,12 +682,12 @@ class billClass {
           throw "Forbidden";
         } else {
           var user;
-          if (jwtDecode.role && jwtDecode.role === 'admin') {
-            user = await this.services.dbcl.getUser(data.uid); 
+          if (jwtDecode.role && jwtDecode.role === "admin") {
+            user = await this.services.dbcl.getUser(data.uid);
           } else {
             user = await this.services.dbcl.getUser(jwtDecode.id);
           }
-          
+
           if (user.verified === "false") {
             throw "UserIsNotVerified";
           }
@@ -737,17 +737,17 @@ class billClass {
             // this.services.dbcl.putUserBill(bill);
 
             let billerdata = {
-              bzFunc : "refreshBill",
-              user_id : user.id,
-              account_id: bill.providerAccountId
+              bzFunc: "refreshBill",
+              user_id: user.id,
+              account_id: bill.providerAccountId,
             };
 
             var sqsResponse = await this.postToFinoSQS(billerdata);
-            this.iconsole.log("sqsResponse:",sqsResponse);
+            this.iconsole.log("sqsResponse:", sqsResponse);
             return {
-              status:"bill_processing",
-              bill:bill
-            }
+              status: "bill_processing",
+              bill: bill,
+            };
           }
         }
       } else {
@@ -1527,20 +1527,20 @@ class billClass {
           }
           aFields = [...aFields, ...serviceFields];
           // }
-          if (payMethod == 'cc') {
+          if (payMethod == "cc") {
             payResult = await this.services.finocl.directPaymentWithCC(
               bill.uid,
               bill.accountId,
               transaction.amountPayee,
               aFields
-            );  
-          } else if (payMethod == 'vcc') {
+            );
+          } else if (payMethod == "vcc") {
             payResult = await this.services.finocl.directPaymentWithVCC(
               bill.uid,
               bill.accountId,
               transaction.amountPayee,
               aFields
-            );  
+            );
           }
 
           this.iconsole.log("Fino pay result: ", payResult);

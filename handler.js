@@ -1,60 +1,59 @@
-'use strict';
+"use strict";
 
-const factoryClass = require('./src/lib/utils/factoryclass');
-const responseclass = require('./src/lib/utils/responseclass');
-const iconsoleclass = require('./src/lib/utils/iconsoleclass');
-const utilsclass = require('./src/lib/utils/utilsclass');
-const messagingClass = require('./src/lib/messaging/messagingclass');
-const taskClass = require('./src/lib/task/taskclass');
-const dbHelperClass = require('./src/lib/db/dbhelperclass');
-const authclass = require('./src/lib/auth/authclass');
-const statsClass = require('./src/lib/stats/statsclass');
-const supportClass = require('./src/lib/support/supportclass');
+const factoryClass = require("./src/lib/utils/factoryclass");
+const responseclass = require("./src/lib/utils/responseclass");
+const iconsoleclass = require("./src/lib/utils/iconsoleclass");
+const utilsclass = require("./src/lib/utils/utilsclass");
+const messagingClass = require("./src/lib/messaging/messagingclass");
+const taskClass = require("./src/lib/task/taskclass");
+const dbHelperClass = require("./src/lib/db/dbhelperclass");
+const authclass = require("./src/lib/auth/authclass");
+const statsClass = require("./src/lib/stats/statsclass");
+const supportClass = require("./src/lib/support/supportclass");
 
-const finoClass = require('./src/lib/payment/finoclass');
-const finov4Class = require('./src/lib/payment/finov4class');
-const stripeClass = require('./src/lib/payment/stripeclass');
-const userclass = require('./src/lib/user/userclass');
-const adminClass = require('./src/lib/admin/adminclass');
-const transactionClass = require('./src/lib/transaction/transactionclass');
-const billClass = require('./src/lib/bill/billclass');
-const vendorClass = require('./src/lib/vendor/vendorclass');
-const ingestClass = require('./src/lib/ingestion/ingestclass');
-const playClass = require('./src/lib/play/playClass');
-const DBPlayHelperClass = require('./src/lib/db/play');
-const UniqueView = require('./src/lib/uniqueview/uniqueView');
-const Engagement = require('./src/lib/engagement/engagement');
+const finoClass = require("./src/lib/payment/finoclass");
+const finov4Class = require("./src/lib/payment/finov4class");
+const stripeClass = require("./src/lib/payment/stripeclass");
+const userclass = require("./src/lib/user/userclass");
+const adminClass = require("./src/lib/admin/adminclass");
+const transactionClass = require("./src/lib/transaction/transactionclass");
+const billClass = require("./src/lib/bill/billclass");
+const vendorClass = require("./src/lib/vendor/vendorclass");
+const ingestClass = require("./src/lib/ingestion/ingestclass");
+const playClass = require("./src/lib/play/playClass");
+const DBPlayHelperClass = require("./src/lib/db/play");
+const UniqueView = require("./src/lib/uniqueview/uniqueView");
+const Engagement = require("./src/lib/engagement/engagement");
 
 const services = new factoryClass();
 const iconsole = new iconsoleclass(services);
 
-const utils = new utilsclass({iconsole, services});
-const msgcl = new messagingClass({iconsole, services});
-const taskcl = new taskClass({iconsole, services});
-const dbcl = new dbHelperClass({iconsole, services});
-const authcl = new authclass({iconsole, services});
-const statscl = new statsClass({iconsole, services});
-const supportcl = new supportClass({iconsole, services});
-const finocl = new finoClass({iconsole, services});
-const finov4cl = new finov4Class({iconsole, services});
+const utils = new utilsclass({ iconsole, services });
+const msgcl = new messagingClass({ iconsole, services });
+const taskcl = new taskClass({ iconsole, services });
+const dbcl = new dbHelperClass({ iconsole, services });
+const authcl = new authclass({ iconsole, services });
+const statscl = new statsClass({ iconsole, services });
+const supportcl = new supportClass({ iconsole, services });
+const finocl = new finoClass({ iconsole, services });
+const finov4cl = new finov4Class({ iconsole, services });
 
-const stripecl = new stripeClass({iconsole, services});
-const usercl = new userclass({iconsole, services});
-const admincl = new adminClass({iconsole, services});
-const transactioncl = new transactionClass({iconsole, services});
-const billcl = new billClass({iconsole, services});
-const vendorcl = new vendorClass({iconsole, services});
-const ingestcl = new ingestClass({iconsole, services});
-const playcl = new playClass({iconsole, services});
-const dbPlay = new DBPlayHelperClass({iconsole, services});
-const uvcl = new UniqueView({iconsole, services});
-const engagementCL = new Engagement({iconsole, services});
-
+const stripecl = new stripeClass({ iconsole, services });
+const usercl = new userclass({ iconsole, services });
+const admincl = new adminClass({ iconsole, services });
+const transactioncl = new transactionClass({ iconsole, services });
+const billcl = new billClass({ iconsole, services });
+const vendorcl = new vendorClass({ iconsole, services });
+const ingestcl = new ingestClass({ iconsole, services });
+const playcl = new playClass({ iconsole, services });
+const dbPlay = new DBPlayHelperClass({ iconsole, services });
+const uvcl = new UniqueView({ iconsole, services });
+const engagementCL = new Engagement({ iconsole, services });
 
 module.exports.AdminManage = async (event) => {
   iconsole.log(event);
   const response = new responseclass();
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === "OPTIONS") {
     return response.options();
   } else {
     var fn = event.pathParameters.fn;
@@ -102,10 +101,14 @@ module.exports.AdminManage = async (event) => {
         response.OK.body.payload = await admincl.getTransactionsByDate(event);
         return response.success();
       } else if (fn === "gettransactionsbyaccountnumber") {
-        response.OK.body.payload = await admincl.getTransactionsByAccountNumber(event);
+        response.OK.body.payload = await admincl.getTransactionsByAccountNumber(
+          event
+        );
         return response.success();
       } else if (fn === "createimagepresignedurl") {
-        response.OK.body.payload = await admincl.createAwsS3ImagePresignedUrl(event);
+        response.OK.body.payload = await admincl.createAwsS3ImagePresignedUrl(
+          event
+        );
         return response.success();
       } else if (fn === "updatevendor") {
         response.OK.body.payload = await admincl.updateVendor(event);
@@ -123,13 +126,17 @@ module.exports.AdminManage = async (event) => {
         response.OK.body.payload = await admincl.addSupportTicket(event);
         return response.success();
       } else if (fn === "adminupdatesupportticket") {
-        response.OK.body.payload = await admincl.adminUpdateSupportTicket(event);
+        response.OK.body.payload = await admincl.adminUpdateSupportTicket(
+          event
+        );
         return response.success();
       } else if (fn === "getsupportticket") {
         response.OK.body.payload = await admincl.getSupportTicket(event);
         return response.success();
       } else if (fn === "getsupporttickets") {
-        response.OK.body.payload = await admincl.getSupportTicketsBetween(event);
+        response.OK.body.payload = await admincl.getSupportTicketsBetween(
+          event
+        );
         return response.success();
       } else if (fn === "getsearchvendorbyyear") {
         response.OK.body.payload = await admincl.getSearchVendorByYear(event);
@@ -178,8 +185,10 @@ module.exports.AdminManage = async (event) => {
         return response.success();
       } else if (fn == "processtwilliosms") {
         let twres = await admincl.ProcessTwillioSms(event);
-        response.OK.headers['Content-Type'] = 'text/xml';
-        return response.success("<Response><Message>Your message received by BillZero support</Message></Response>");
+        response.OK.headers["Content-Type"] = "text/xml";
+        return response.success(
+          "<Response><Message>Your message received by BillZero support</Message></Response>"
+        );
       } else if (fn == "getshelters") {
         response.OK.body.payload = await admincl.getShelters(event);
         return response.success();
@@ -220,13 +229,12 @@ module.exports.AdminManage = async (event) => {
       return response.fail(error);
     }
   }
-
 };
 
 module.exports.UserManage = async (event) => {
   iconsole.log(event);
   const response = new responseclass();
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === "OPTIONS") {
     return response.options();
   } else {
     var fn = event.pathParameters.fn;
@@ -238,7 +246,9 @@ module.exports.UserManage = async (event) => {
         response.OK.body.payload = await usercl.updateUser(event);
         return response.success();
       } else if (fn == "checkusername") {
-        response.OK.body.payload = await usercl.checkUserNameAvailability(event);
+        response.OK.body.payload = await usercl.checkUserNameAvailability(
+          event
+        );
         return response.success();
       } else if (fn == "getbyusername") {
         response.OK.body.payload = await usercl.getUserByUserName(event);
@@ -256,14 +266,18 @@ module.exports.UserManage = async (event) => {
         response.OK.body.payload = await usercl.validatePhone(event);
         return response.success();
       } else if (fn == "creates3presignedurl") {
-        response.OK.body.payload = await usercl.createAwsS3PutPresignedUrl(event);
+        response.OK.body.payload = await usercl.createAwsS3PutPresignedUrl(
+          event
+        );
         return response.success();
       } else if (fn == "creates3thxpresignedurl") {
-        response.OK.body.payload = await usercl.createAwsS3PutThxPresignedUrl(event);
+        response.OK.body.payload = await usercl.createAwsS3PutThxPresignedUrl(
+          event
+        );
         return response.success();
       } else if (fn == "awsS3PictureDeletion") {
-        response.OK.body.payload = await usercl.AwsS3PictureDeletion(event)
-        return response.success
+        response.OK.body.payload = await usercl.AwsS3PictureDeletion(event);
+        return response.success;
       } else if (fn == "addpaymentmethod") {
         response.OK.body.payload = await usercl.addPaymentMethod(event);
         return response.success();
@@ -295,7 +309,9 @@ module.exports.UserManage = async (event) => {
         response.OK.body.payload = await usercl.updateSubscriptionPlan(event);
         return response.success();
       } else if (fn == "updatesubpaymentsource") {
-        response.OK.body.payload = await usercl.updateSubscriptionPaymentSource(event);
+        response.OK.body.payload = await usercl.updateSubscriptionPaymentSource(
+          event
+        );
         return response.success();
       } else if (fn == "getpayeesubscription") {
         response.OK.body.payload = await usercl.getPayeeSubscription(event);
@@ -307,18 +323,22 @@ module.exports.UserManage = async (event) => {
         response.OK.body.payload = await usercl.addMobileSupportTicket(event);
         return response.success();
       } else if (fn == "updatemobilesupportticket") {
-        response.OK.body.payload = await usercl.updateMobileSupportTicket(event);
+        response.OK.body.payload = await usercl.updateMobileSupportTicket(
+          event
+        );
         return response.success();
       } else if (fn == "getusersupporttickets") {
         response.OK.body.payload = await usercl.getUserSupportTickets(event);
         return response.success();
-      } else if (fn == "deleteme") {   // for testing
+      } else if (fn == "deleteme") {
+        // for testing
         response.OK.body.payload = await usercl.deleteMe(event);
         return response.success();
       } else if (fn == "notifyuser") {
         response.OK.body.payload = await usercl.notifyUser(event);
         return response.success();
-      } else if (fn == "sendtestpush") {   // for testing
+      } else if (fn == "sendtestpush") {
+        // for testing
         response.OK.body.payload = await usercl.sendTestPush(event);
         return response.success();
       } else if (fn == "tos") {
@@ -334,13 +354,12 @@ module.exports.UserManage = async (event) => {
       return response.fail(error);
     }
   }
-
 };
 
 module.exports.BillManage = async (event) => {
   iconsole.log(event);
   const response = new responseclass();
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === "OPTIONS") {
     return response.options();
   } else {
     var fn = event.pathParameters.fn;
@@ -391,7 +410,9 @@ module.exports.BillManage = async (event) => {
         response.OK.body.payload = await billcl.getUserBillTransactions(event);
         return response.success();
       } else if (fn == "getbilltransactionsbyuserid") {
-        response.OK.body.payload = await billcl.getBillTransactionsByUserID(event);
+        response.OK.body.payload = await billcl.getBillTransactionsByUserID(
+          event
+        );
         return response.success();
       } else if (fn == "getmybills") {
         response.OK.body.payload = await billcl.getMyBills(event);
@@ -423,17 +444,18 @@ module.exports.BillManage = async (event) => {
   }
 };
 
-
 module.exports.TransactionManage = async (event) => {
   iconsole.log(event);
   const response = new responseclass();
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === "OPTIONS") {
     return response.options();
   } else {
     var fn = event.pathParameters.fn;
     try {
       if (fn == "list") {
-        response.OK.body.payload = await transactioncl.getUserTransactions(event);
+        response.OK.body.payload = await transactioncl.getUserTransactions(
+          event
+        );
         return response.success();
       } else if (fn == "payers") {
         response.OK.body.payload = await transactioncl.getUserPayers(event);
@@ -450,7 +472,7 @@ module.exports.TransactionManage = async (event) => {
 module.exports.VendorManage = async (event) => {
   console.log(event);
   const response = new responseclass();
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === "OPTIONS") {
     return response.options();
   } else {
     var fn = event.pathParameters.fn;
@@ -488,13 +510,13 @@ module.exports.VendorManage = async (event) => {
 module.exports.IngestManage = async (event, context) => {
   if (event.httpMethod) {
     const response = new responseclass();
-    if (event.httpMethod === 'OPTIONS') {
+    if (event.httpMethod === "OPTIONS") {
       return response.options();
     } else {
       const fn = event.pathParameters.fn;
 
       try {
-        if (fn === 'netnewreport') {
+        if (fn === "netnewreport") {
           response.OK.body.payload = await ingestcl.getNetNewReport();
           return response.success();
         }
@@ -502,7 +524,7 @@ module.exports.IngestManage = async (event, context) => {
         response.fail(error);
       }
     }
-  } else if (event['detail-type'].toLowerCase().indexOf('scheduled') !== -1) {
+  } else if (event["detail-type"].toLowerCase().indexOf("scheduled") !== -1) {
     await ingestcl.scheduleIngest(event, context);
   }
 };
@@ -514,7 +536,14 @@ module.exports.processTask = async (event) => {
   var allPromises = [];
   if (event.Records) {
     event.Records.forEach((record) => {
-      if (record.eventSource && record.eventName && record.dynamodb && record.dynamodb.OldImage && record.eventSource == 'aws:dynamodb' && record.eventName == 'REMOVE') {
+      if (
+        record.eventSource &&
+        record.eventName &&
+        record.dynamodb &&
+        record.dynamodb.OldImage &&
+        record.eventSource == "aws:dynamodb" &&
+        record.eventName == "REMOVE"
+      ) {
         var task = dbcl.unmarshall(record.dynamodb.OldImage);
         if (task.status && task.status === "pending") {
           iconsole.log("processTask:", JSON.stringify(task));
@@ -535,27 +564,30 @@ module.exports.processTask = async (event) => {
 module.exports.processNewPay = async (event, context) => {
   try {
     if (event.Records) {
-      let processedPools = []
-      console.log('DynamoDB Process NewPay Event: %j', event);
+      let processedPools = [];
+      console.log("DynamoDB Process NewPay Event: %j", event);
       for (const record of event.Records) {
-        console.log('DynamoDB Record: %j', record);
-        if (record.eventName === 'INSERT') {
+        console.log("DynamoDB Record: %j", record);
+        if (record.eventName === "INSERT") {
           const newImage = record.dynamodb.NewImage;
           const eventSource = record.eventSourceARN;
-          if (eventSource.search(dbcl.chargeTable) > 0) { // triggered by new pay
+          if (eventSource.search(dbcl.chargeTable) > 0) {
+            // triggered by new pay
             const payeeId = newImage.billUserId.S;
             const payerId = newImage.uid.S;
-            const paymentAmount = newImage.amount.N
+            const paymentAmount = newImage.amount.N;
             const poolInfo = await dbPlay.getPoolOfUser(payeeId);
             if (poolInfo) {
               if (processedPools.includes(poolInfo.poolId)) {
-                console.log('processCycle alreadyProcessed', poolInfo);
+                console.log("processCycle alreadyProcessed", poolInfo);
                 // already processed pool
                 continue;
               }
               processedPools.push(poolInfo.poolId);
-              await dbPlay.refreshCycle(poolInfo, payeeId, payerId, {by: 'pay', paymentAmount});
-
+              await dbPlay.refreshCycle(poolInfo, payeeId, payerId, {
+                by: "pay",
+                paymentAmount,
+              });
             }
           }
         }
@@ -571,30 +603,40 @@ module.exports.processCycle = async (event, context) => {
   try {
     if (event.Records) {
       let processedPools = [];
-      console.log('DynamoDB Record Event: %j', event);
+      console.log("DynamoDB Record Event: %j", event);
       for (const record of event.Records) {
-        console.log('DynamoDB Record: %j', record);
-        if (record.eventName === 'MODIFY') {
+        console.log("DynamoDB Record: %j", record);
+        if (record.eventName === "MODIFY") {
           const newImage = record.dynamodb.NewImage;
           const oldImage = record.dynamodb.OldImage;
           const eventSource = record.eventSourceARN;
-          if (eventSource.search(dbcl.userTable) > 0) { // triggered by new cc
+          if (eventSource.search(dbcl.userTable) > 0) {
+            // triggered by new cc
             try {
-              if (!oldImage.payment.M.hasOwnProperty('stripeId')
-                && newImage.payment.M.stripeId !== null) {
+              if (
+                !oldImage.payment.M.hasOwnProperty("stripeId") &&
+                newImage.payment.M.stripeId !== null
+              ) {
                 //cc is added
-                console.log('Modified User added new CC');
+                console.log("Modified User added new CC");
                 let viewerId = newImage.id.S;
                 let userId;
                 // check related uv and remove all pending state
-                const {uvV, cc, bills, needUpdate} = await usercl.checkUserUVVirgin(viewerId);
+                const { uvV, cc, bills, needUpdate } =
+                  await usercl.checkUserUVVirgin(viewerId);
                 // check related uv and remove all pending state
-                if ((uvV && (needUpdate === false)) || (bills > 0)) { //already verified
+                if ((uvV && needUpdate === false) || bills > 0) {
+                  //already verified
                   //no need to recalculate again
-                  console.log('Modified User added new CC - no need to trigger - already verified');
+                  console.log(
+                    "Modified User added new CC - no need to trigger - already verified"
+                  );
                 } else {
                   const pendingUVs = await uvcl.getPendingUVs(viewerId);
-                  console.log('Modified User added new CC - no need to trigger - already verified', pendingUVs);
+                  console.log(
+                    "Modified User added new CC - no need to trigger - already verified",
+                    pendingUVs
+                  );
                   for (const _pendingUV of pendingUVs) {
                     userId = _pendingUV.userid;
                     const poolInfo = await dbPlay.getPoolOfUser(userId);
@@ -604,45 +646,53 @@ module.exports.processCycle = async (event, context) => {
                       userId: userId,
                       viewerId: viewerId,
                       poolId: poolInfo.poolId,
-                      UVVType: 'newCC'
+                      UVVType: "newCC",
                     });
 
                     if (processedPools.includes(poolInfo.poolId)) {
-                      console.log('processCycle alreadyProcessed', poolInfo);
+                      console.log("processCycle alreadyProcessed", poolInfo);
                       // already processed pool
                       continue;
                     }
 
                     if (newUVV) {
-                      const viewerInfo = await this.services.dbcl.getUser(userId);
+                      const viewerInfo = await this.services.dbcl.getUser(
+                        userId
+                      );
                       viewerInfo.UVV = newUVV.id;
                       await this.services.dbcl.putUser(viewerInfo);
                     }
 
                     processedPools.push(poolInfo.poolId);
-                    const by = 'cc'
-                    await dbPlay.refreshCycle(poolInfo, userId, viewerId, {by});
+                    const by = "cc";
+                    await dbPlay.refreshCycle(poolInfo, userId, viewerId, {
+                      by,
+                    });
                   }
                 }
               }
-            } catch (error) {
-            }
+            } catch (error) {}
           }
-        }
-        else if (record.eventName === 'INSERT') {
+        } else if (record.eventName === "INSERT") {
           const newImage = record.dynamodb.NewImage;
           const eventSource = record.eventSourceARN;
           let userId, viewerId, payerId, id;
-          if (eventSource.search(dbcl.billTable) > 0) { // triggered by new bill
+          if (eventSource.search(dbcl.billTable) > 0) {
+            // triggered by new bill
             payerId = newImage.uid.S;
             // check related uv and remove all pending state
-            const {uvV, cc, bills, needUpdate} = await usercl.checkUserUVVirgin(payerId);
+            const { uvV, cc, bills, needUpdate } =
+              await usercl.checkUserUVVirgin(payerId);
             //  const {hasCC, uvV} = await dbcl.checkUserHasCC(viewerId);
-            if (uvV && needUpdate === false || cc) {
+            if ((uvV && needUpdate === false) || cc) {
               //need to put engagement here
-              console.log('Modified User added new bill - no need to trigger - already verified');
+              console.log(
+                "Modified User added new bill - no need to trigger - already verified"
+              );
             } else {
-              console.log(`Triggered by newBill userhasCC uvVirgin:${uvV} cc: ${cc} updated: ${needUpdate} bills: ${bills}`);
+              console.log(
+                `Triggered by newBill userhasCC uvVirgin:${uvV} cc: ${cc} updated: ${needUpdate} bills: ${bills}`
+              );
               if (bills === 1) {
                 // new validated
                 // get pending uvs of this viewer.
@@ -651,30 +701,30 @@ module.exports.processCycle = async (event, context) => {
                   userId = _pendingUV.userid;
                   const poolInfo = await dbPlay.getPoolOfUser(userId);
 
-                  console.log('UV is validated ', poolInfo);
+                  console.log("UV is validated ", poolInfo);
                   const newUVV = await engagementCL.newEngagementByUVV({
                     userId: userId,
                     viewerId: payerId,
                     poolId: poolInfo.poolId,
-                    UVVType: 'newBill'
+                    UVVType: "newBill",
                   });
                   const viewerInfo = await this.services.dbcl.getUser(payerId);
                   viewerInfo.UVV = newUVV.id;
                   await this.services.dbcl.putUser(viewerInfo);
 
                   if (processedPools.includes(poolInfo.poolId)) {
-                    console.log('processCycle alreadyProcessed', poolInfo);
+                    console.log("processCycle alreadyProcessed", poolInfo);
                     // already processed pool
                     continue;
                   }
                   processedPools.push(poolInfo.poolId);
-                  const by = 'bill';
-                  await dbPlay.refreshCycle(poolInfo, userId, payerId, {by});
+                  const by = "bill";
+                  await dbPlay.refreshCycle(poolInfo, userId, payerId, { by });
                 }
               }
             }
-
-          } else if (eventSource.search(dbcl.uvTable) > 0) { // triggered by uv table
+          } else if (eventSource.search(dbcl.uvTable) > 0) {
+            // triggered by uv table
             userId = newImage.userid.S;
             viewerId = newImage.viewerId.S;
             id = newImage.id.S;
@@ -683,25 +733,29 @@ module.exports.processCycle = async (event, context) => {
             if (!isValidViewer) {
               continue;
             }
-            const {uvV, cc, bills, needUpdate} = await usercl.checkUserUVVirgin(viewerId);
+            const { uvV, cc, bills, needUpdate } =
+              await usercl.checkUserUVVirgin(viewerId);
             // const {hasCC, uvV} = await dbcl.checkUserHasCC(viewerId);
             // const hasBill = await dbcl.checkUserHasBILL(viewerId);
-            console.log(`New UV: ${viewerId}, now check if it is validated or not`);
+            console.log(
+              `New UV: ${viewerId}, now check if it is validated or not`
+            );
             console.log(`uv:${uvV} userhasCC ${cc} userhasBill ${bills}`);
-            if (uvV === true) {  //New UV and verified
+            if (uvV === true) {
+              //New UV and verified
               //UV is validated UVV process
               const poolInfo = await dbPlay.getPoolOfUser(userId);
               if (processedPools.includes(poolInfo.poolId)) {
-                console.log('processCycle alreadyProcessed', poolInfo);
+                console.log("processCycle alreadyProcessed", poolInfo);
                 // already processed pool
                 continue;
               }
-              console.log('UV is validated ', poolInfo);
+              console.log("UV is validated ", poolInfo);
               const newUVV = await engagementCL.newEngagementByUVV({
                 userId: userId,
                 viewerId: viewerId,
                 poolId: poolInfo.poolId,
-                UVVType: 'newUV'
+                UVVType: "newUV",
               });
 
               if (newUVV) {
@@ -710,9 +764,8 @@ module.exports.processCycle = async (event, context) => {
                 await this.services.dbcl.putUser(viewerInfo);
               }
               processedPools.push(poolInfo.poolId);
-              const by = 'uv';
-              await dbPlay.refreshCycle(poolInfo, userId, viewerId, {by});
-
+              const by = "uv";
+              await dbPlay.refreshCycle(poolInfo, userId, viewerId, { by });
             } else {
               // UV Unvalidated
               const poolInfo = await dbPlay.getPoolOfUser(userId);
@@ -725,7 +778,7 @@ module.exports.processCycle = async (event, context) => {
               await engagementCL.newEngagementByUVU({
                 userId: userId,
                 viewerId: viewerId,
-                poolId: poolInfo.poolId
+                poolId: poolInfo.poolId,
               });
             }
           }
@@ -733,7 +786,7 @@ module.exports.processCycle = async (event, context) => {
       }
     }
   } catch (e) {
-    console.log('ProcessCycle triggered by Dynamodb error', e);
+    console.log("ProcessCycle triggered by Dynamodb error", e);
     return `Error occured ${event.Records.length} records.`;
   }
   return `Successfully processed ${event.Records.length} records.`;

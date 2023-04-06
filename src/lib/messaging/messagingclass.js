@@ -17,7 +17,6 @@ if (admin.apps.length === 0) {
   });
 }
 
-
 class messagingClass {
   constructor(args) {
     for (var parameter in args) {
@@ -37,7 +36,7 @@ class messagingClass {
         : process.env.SENDGRID_FROM_EMAIL;
       var emailParam = {
         to: params.toEmail,
-        from: {name: params.fromName, email: params.fromEmail},
+        from: { name: params.fromName, email: params.fromEmail },
         subject: params.subject,
         html: params.content,
         substitutions: {},
@@ -60,12 +59,11 @@ class messagingClass {
     }
   }
 
-  async sendSMS(to, message, from) {
+  async sendSMS(to, message, from = process.env.TWILIOPHONE) {
     try {
       try {
         const prefix = "BillZero | ";
-        from = from ? from : process.env.TWILIOPHONE;
-        this.iconsole.log({to: to, message: message, from: from});
+        this.iconsole.log({ to: to, message: message, from: from });
         var message = await twiliocl.messages.create({
           body: prefix + message,
           to: to,
@@ -174,7 +172,7 @@ class messagingClass {
       } else {
         throw "failed to notify user";
       }
-      return {status: "success", info: "user notified"};
+      return { status: "success", info: "user notified" };
     } catch (error) {
       this.iconsole.log(error);
       throw error;
@@ -183,7 +181,13 @@ class messagingClass {
 
   async notifyUser(id, message, data = null) {
     try {
-      const filteredNumbers = ['6027952289', '2342218202', '5304752777', '3343283680', '7608842275'];
+      const filteredNumbers = [
+        "6027952289",
+        "2342218202",
+        "5304752777",
+        "3343283680",
+        "7608842275",
+      ];
 
       this.iconsole.log(id, message);
       let user = await this.services.dbcl.getUser(id);
@@ -195,7 +199,7 @@ class messagingClass {
         user.settings.push !== undefined &&
         user.settings.push === true
       ) {
-        console.log('dev token Push');
+        console.log("dev token Push");
         let pushObj = {
           title: "BillZero",
           body: message,
@@ -207,7 +211,7 @@ class messagingClass {
           if (user.phone.indexOf(_filterNumber) !== -1) {
             console.log(`messagging - This is filtering Phone ${message}`);
             let smsResult = await this.sendSMS(user.phone, message);
-            return {status: "success", info: "user notified"};
+            return { status: "success", info: "user notified" };
           }
         }
         const inMyPool = await this.services.dbPlay.checkInMyPool(id);
@@ -216,13 +220,13 @@ class messagingClass {
           return;
         }
         console.log(`messagging - I am in your pool ${message}`);
-        let smsResult = await this.sendSMS('6027952289', message);
+        let smsResult = await this.sendSMS("6027952289", message);
         // this.iconsole.log(smsResult);
-        return {status: "success", info: "user notified"};
+        return { status: "success", info: "user notified" };
       } else {
         throw "failed to notify user";
       }
-      return {status: "success", info: "user notified"};
+      return { status: "success", info: "user notified" };
     } catch (error) {
       this.iconsole.log(error);
       throw error;
@@ -297,10 +301,10 @@ class messagingClass {
         throw "Invalid task";
       }
 
-      return {status: "success", info: "task completed", id: task.id};
+      return { status: "success", info: "task completed", id: task.id };
     } catch (error) {
       this.iconsole.log(error);
-      return {status: "fail", info: error, id: task.id};
+      return { status: "fail", info: error, id: task.id };
       //throw error;
     }
   }
@@ -308,140 +312,174 @@ class messagingClass {
   async notifyUserByImpetus(stage, payload) {
     let impetusPayload = await this.services.dbcl.getImpetusEntry(stage);
     let msg;
-    if (stage === 'play-uv-pending-payer') {
+    if (stage === "play-uv-pending-payer") {
       // to Payer - YOU'VE ALMOST WON! ADD a CC or BILL for @[PAYEEUSERNAME] to WIN (VERIFICATION)
-      let {payeeId, payerId, payee} = payload;
+      let { payeeId, payerId, payee } = payload;
       if (!payee) {
         payee = await this.services.dbcl.getUser(payeeId);
       }
-      msg = impetusPayload.replace('[PAYEEUSERNAME]', `${payee.userName}`);
+      msg = impetusPayload.replace("[PAYEEUSERNAME]", `${payee.userName}`);
       await this.notifyUser(payerId, msg);
-    } else if (stage === 'play-uv-pending-payee') {
+    } else if (stage === "play-uv-pending-payee") {
       // to Payee - YOU WON a UV.. almost.. Tell them to ADD a CC or BILL to WIN
-      const {payeeId} = payload;
+      const { payeeId } = payload;
       msg = impetusPayload;
       await this.notifyUser(payeeId, msg);
-
-    } else if (stage === 'play-uv-validated-payer') {
+    } else if (stage === "play-uv-validated-payer") {
       // to Payer - YOU W1N + HELPED @[PAYEEUSERNAME] WN TODAY
-      let {payeeId, payerId, payee} = payload;
+      let { payeeId, payerId, payee } = payload;
       if (!payee) {
         payee = await this.services.dbcl.getUser(payeeId);
       }
-      msg = impetusPayload.replace('[PAYEEUSERNAME]', `${payee.userName}`);
+      msg = impetusPayload.replace("[PAYEEUSERNAME]", `${payee.userName}`);
       await this.notifyUser(payerId, msg);
-
-    } else if (stage === 'play-pay-payee') {
-      let {payeeId, payerId, expectProb, payer} = payload;
+    } else if (stage === "play-pay-payee") {
+      let { payeeId, payerId, expectProb, payer } = payload;
       // to Payee - YOU WON a PAY! [PAYERUSERNAME] INCREASED your PROBABILITY [PROB]%
       if (!payer) {
         payer = await this.services.dbcl.getUser(payerId);
       }
-      msg = impetusPayload.replace('[PAYERUSERNAME]', `${payer.userName}`).replace('[PROB]', `${expectProb}`);
+      msg = impetusPayload
+        .replace("[PAYERUSERNAME]", `${payer.userName}`)
+        .replace("[PROB]", `${expectProb}`);
       await this.notifyUser(payeeId, msg);
-    } else if (stage === 'play-ending') {
-      const {pot, value} = payload;
-      impetusPayload = impetusPayload.replace('$[POT]', `${pot}$`);
+    } else if (stage === "play-ending") {
+      const { pot, value } = payload;
+      impetusPayload = impetusPayload.replace("$[POT]", `${pot}$`);
       let notificationPromise = [];
       for (let i = 0; i < value.length; i++) {
-//Game Ending.. POT = $[POT] You have $[PROB] to Win + LAST CHANCE to beat $[@NEXTHIGHESTPROBUSERINPOOL] $[COMPETINGUSERPROB]
+        //Game Ending.. POT = $[POT] You have $[PROB] to Win + LAST CHANCE to beat $[@NEXTHIGHESTPROBUSERINPOOL] $[COMPETINGUSERPROB]
         let msg = impetusPayload;
-        msg = msg.replace('$[PROB]', `${Math.round(value[i].probability)}%`);
+        msg = msg.replace("$[PROB]", `${Math.round(value[i].probability)}%`);
         if (i < value.length - 1) {
           let user = await this.services.dbcl.getUser(value[i].userid);
-          msg = msg.replace('[NEXTHIGHESTPROBUSERINPOOL]', `${user.userName}`);
-          msg = msg.replace('[COMPETINGUSERPROB]', `${value[i + 1].probability}`);
+          msg = msg.replace("[NEXTHIGHESTPROBUSERINPOOL]", `${user.userName}`);
+          msg = msg.replace(
+            "[COMPETINGUSERPROB]",
+            `${value[i + 1].probability}`
+          );
         } else {
-          msg = msg.replace('[NEXTHIGHESTPROBUSERINPOOL]', 'nobody');
-          msg = msg.replace('[COMPETINGUSERPROB]', '0');
+          msg = msg.replace("[NEXTHIGHESTPROBUSERINPOOL]", "nobody");
+          msg = msg.replace("[COMPETINGUSERPROB]", "0");
         }
-        notificationPromise.push(new Promise((resolve, reject) => {
-          this.services.msgcl.notifyUser(value[i].userid, msg).then((res) => {
-            resolve();
-          });
-        }));
+        notificationPromise.push(
+          new Promise((resolve, reject) => {
+            this.services.msgcl.notifyUser(value[i].userid, msg).then((res) => {
+              resolve();
+            });
+          })
+        );
       }
       await Promise.all(notificationPromise);
-
-    } else if (stage === 'play-start') {
-      const {value} = payload;
+    } else if (stage === "play-start") {
+      const { value } = payload;
       let notificationPromise = [];
       for (let i = 0; i < value.length; i++) {
-//GAME STARTING... YOU HAVE $[PROB] to WIN TODAY nGet PAYs to BEAT @[NEXTHIGHESTPROBUSERINPOOL] w [COMPETINGUSERPROB]% to WIN
+        //GAME STARTING... YOU HAVE $[PROB] to WIN TODAY nGet PAYs to BEAT @[NEXTHIGHESTPROBUSERINPOOL] w [COMPETINGUSERPROB]% to WIN
         let msg = impetusPayload;
-        msg = msg.replace('$[PROB]', `${Math.round(value[i].probability)}%`);
+        msg = msg.replace("$[PROB]", `${Math.round(value[i].probability)}%`);
         if (i < value.length - 1) {
           let user = await this.services.dbcl.getUser(value[i + 1].userid);
-          msg = msg.replace('[NEXTHIGHESTPROBUSERINPOOL]', `${user.userName}`);
-          msg = msg.replace('[COMPETINGUSERPROB]', `${value[i + 1].probability}`);
+          msg = msg.replace("[NEXTHIGHESTPROBUSERINPOOL]", `${user.userName}`);
+          msg = msg.replace(
+            "[COMPETINGUSERPROB]",
+            `${value[i + 1].probability}`
+          );
         } else {
-          msg = msg.replace('[NEXTHIGHESTPROBUSERINPOOL]', 'nobody');
-          msg = msg.replace('[COMPETINGUSERPROB]', '0');
+          msg = msg.replace("[NEXTHIGHESTPROBUSERINPOOL]", "nobody");
+          msg = msg.replace("[COMPETINGUSERPROB]", "0");
         }
-        notificationPromise.push(new Promise((resolve, reject) => {
-          this.services.msgcl.notifyUser(value[i].userid, msg).then((res) => {
-            resolve();
-          });
-        }));
+        notificationPromise.push(
+          new Promise((resolve, reject) => {
+            this.services.msgcl.notifyUser(value[i].userid, msg).then((res) => {
+              resolve();
+            });
+          })
+        );
       }
       await Promise.all(notificationPromise);
-    } else if (stage === 'play-pay-pool') {
+    } else if (stage === "play-pay-pool") {
       //	[USERNAMEPAYWINNER] GOT a $[PAYAMOUNT] PAY + is NOW #[USERRANK] to WIN
-      const {payerId, payeeId, paymentAmount, value} = payload;
+      const { payerId, payeeId, paymentAmount, value } = payload;
       const rankOfPayee = this.services.dbPlay.getRankOfUser(payeeId, value);
       const payee = await this.services.dbcl.getUser(payeeId);
-      msg = impetusPayload.replace('[USERNAMEPAYWINNER]', `${payee.userName}`);
-      msg = msg.replace('[PAYAMOUNT]', `${paymentAmount}`);
-      msg = msg.replace('[USERRANK]', `${rankOfPayee}`);
+      msg = impetusPayload.replace("[USERNAMEPAYWINNER]", `${payee.userName}`);
+      msg = msg.replace("[PAYAMOUNT]", `${paymentAmount}`);
+      msg = msg.replace("[USERRANK]", `${rankOfPayee}`);
       let notificationPromise = [];
       let payeeProb = 0.0;
       for (let i = 0; i < value.length; i++) {
-        notificationPromise.push(new Promise((resolve, reject) => {
-          this.services.msgcl.notifyUser(value[i].userid, msg).then((res) => {
-            resolve();
-          });
-        }));
+        notificationPromise.push(
+          new Promise((resolve, reject) => {
+            this.services.msgcl.notifyUser(value[i].userid, msg).then((res) => {
+              resolve();
+            });
+          })
+        );
         if (payeeId === value[i].userid) {
-          payeeProb = value[i].probability
+          payeeProb = value[i].probability;
         }
       }
 
-      let impetusToPayee = await this.services.dbcl.getImpetusEntry('play-pay-payee');
+      let impetusToPayee = await this.services.dbcl.getImpetusEntry(
+        "play-pay-payee"
+      );
       //YOU W0N [PAYAMOUNT] PAY by [PAYERUSERNAME] INCREASED your PROBABILITY [PROB]
       const payer = await this.services.dbcl.getUser(payerId);
-      impetusToPayee = impetusToPayee.replace('[PAYAMOUNT]', `${paymentAmount}`);
-      impetusToPayee = impetusToPayee.replace('[PAYERUSERNAME]', `${payer.userName}`);
-      impetusToPayee = impetusToPayee.replace('[PROB]', `${payeeProb}%`);
-      notificationPromise.push(new Promise((resolve, reject) => {
-        this.services.msgcl.notifyUser(payeeId, impetusToPayee).then((res) => {
-          resolve();
-        });
-      }));
+      impetusToPayee = impetusToPayee.replace(
+        "[PAYAMOUNT]",
+        `${paymentAmount}`
+      );
+      impetusToPayee = impetusToPayee.replace(
+        "[PAYERUSERNAME]",
+        `${payer.userName}`
+      );
+      impetusToPayee = impetusToPayee.replace("[PROB]", `${payeeProb}%`);
+      notificationPromise.push(
+        new Promise((resolve, reject) => {
+          this.services.msgcl
+            .notifyUser(payeeId, impetusToPayee)
+            .then((res) => {
+              resolve();
+            });
+        })
+      );
 
-      let impetusToPayer = await this.services.dbcl.getImpetusEntry('play-pay-payer');
+      let impetusToPayer = await this.services.dbcl.getImpetusEntry(
+        "play-pay-payer"
+      );
       //YOU WON KARMA from [PAYEEUSERNAME] YOUR KARMA: [KARMA]
-      impetusToPayer = impetusToPayer.replace('[PAYEEUSERNAME]', payee.userName);
-      notificationPromise.push(new Promise((resolve, reject) => {
-        this.services.msgcl.notifyUser(payerId, impetusToPayer).then((res) => {
-          resolve();
-        });
-      }));
+      impetusToPayer = impetusToPayer.replace(
+        "[PAYEEUSERNAME]",
+        payee.userName
+      );
+      notificationPromise.push(
+        new Promise((resolve, reject) => {
+          this.services.msgcl
+            .notifyUser(payerId, impetusToPayer)
+            .then((res) => {
+              resolve();
+            });
+        })
+      );
 
       await Promise.all(notificationPromise);
-    } else if (stage === 'play-uv-pool') {
+    } else if (stage === "play-uv-pool") {
       // play-uv-pool	[USERNAMEUVWINNER] WON a UV + is NOW #[USERRANK] to WIN
-      const {payerId, payeeId, value} = payload;
+      const { payerId, payeeId, value } = payload;
       const rankOfPayee = this.services.dbPlay.getRankOfUser(payeeId, value);
       const payee = await this.services.dbcl.getUser(payeeId);
-      msg = impetusPayload.replace('[USERNAMEUVWINNER]', `${payee.userName}`);
-      msg = msg.replace('[USERRANK]', `${rankOfPayee}`);
+      msg = impetusPayload.replace("[USERNAMEUVWINNER]", `${payee.userName}`);
+      msg = msg.replace("[USERRANK]", `${rankOfPayee}`);
       let notificationPromise = [];
       for (let i = 0; i < value.length; i++) {
-        notificationPromise.push(new Promise((resolve, reject) => {
-          this.services.msgcl.notifyUser(value[i].userid, msg).then((res) => {
-            resolve();
-          });
-        }));
+        notificationPromise.push(
+          new Promise((resolve, reject) => {
+            this.services.msgcl.notifyUser(value[i].userid, msg).then((res) => {
+              resolve();
+            });
+          })
+        );
       }
       await Promise.all(notificationPromise);
     }

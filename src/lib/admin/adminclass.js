@@ -79,7 +79,7 @@ class adminClass {
       var jwtDecode = await this.services.authcl.auth(event);
 
       let dbSettings = await this.services.dbcl.getAdminSettings("common");
-      const {paymentSettings} = dbSettings.settings;
+      const { paymentSettings } = dbSettings.settings;
       return {
         minimum: paymentSettings.minimumAmount,
         maximum: paymentSettings.maximumAmount,
@@ -539,7 +539,6 @@ class adminClass {
     }
   }
 
-
   async testFunc(event) {
     // const url = 'https://billzero.app.link/zaevDMqvIjb';
     const branch_key = "key_live_piT9H2dFIkvOy32aRyZR2ebnqCiYKIGm";
@@ -552,96 +551,103 @@ class adminClass {
     //   type: 'aggregationCompletedEvent' }
     const bill = {
       accountId: 99320,
-      dueDate: '2021-10-04',
-      status: 'success',
-      dl: '',
-      createdAt: '2021-09-17T19:39:30.106Z',
-      logo: 'ladwp.utilities.png',
-      accountNumber: '8397200000',
-      uid: '17ee21c4-e042-46f9-98e8-ac7224781920',
+      dueDate: "2021-10-04",
+      status: "success",
+      dl: "",
+      createdAt: "2021-09-17T19:39:30.106Z",
+      logo: "ladwp.utilities.png",
+      accountNumber: "8397200000",
+      uid: "17ee21c4-e042-46f9-98e8-ac7224781920",
       paymentOptions: {},
-      active: 'true',
+      active: "true",
       balance: 3703.95,
-      billerType: 'utilities',
-      image: 'https://billzero-prod.s3.amazonaws.com/vendors/051282b2-34b4-45bc-8413-6f79d23272e1/image.jpg',
-      updatedAt: '2021-09-17T19:39:30.106Z',
-      providerName: 'LADWP',
-      id: '051282b2-34b4-45bc-8413-6f79d23272e1',
-      bztype: ['utilities'],
-      imagex: 'https://billzero-prod.s3.amazonaws.com/vendors/051282b2-34b4-45bc-8413-6f79d23272e1/imagex.jpg',
-      name: 'LADWP',
-      hookEvent: 'aggregationCompletedEvent',
+      billerType: "utilities",
+      image:
+        "https://billzero-prod.s3.amazonaws.com/vendors/051282b2-34b4-45bc-8413-6f79d23272e1/image.jpg",
+      updatedAt: "2021-09-17T19:39:30.106Z",
+      providerName: "LADWP",
+      id: "051282b2-34b4-45bc-8413-6f79d23272e1",
+      bztype: ["utilities"],
+      imagex:
+        "https://billzero-prod.s3.amazonaws.com/vendors/051282b2-34b4-45bc-8413-6f79d23272e1/imagex.jpg",
+      name: "LADWP",
+      hookEvent: "aggregationCompletedEvent",
       providerAccountId: 173497,
-      trackingToken: '5e04576a-9f40-4778-8bad-9dbc231c1408',
-      accountData:
-        {
-          accountId: 99320,
-          accountNumber: '8397200000',
-          userDefinedData: null,
-          nickName: null,
-          accountName: null,
-          dueDate: 1633330800000,
-          amountDue: 3703.95,
-          lastPaymentAmount: 2.61,
-          lastPaymentDate: 1631602800000,
-          isEstimatedData: false,
-          billerAddress:
-            {
-              address1: 'PO BOX 30808',
-              address2: 'LOS ANGELES  CA 90030-0808',
-              city: 'LOS ANGELES ',
-              state: 'CA',
-              zip: '90030-0808'
-            },
-          isAutoPay: null,
-          billStatus: null,
-          autoPayDate: null,
-          payFromId: null,
-          paymentMethod: null
+      trackingToken: "5e04576a-9f40-4778-8bad-9dbc231c1408",
+      accountData: {
+        accountId: 99320,
+        accountNumber: "8397200000",
+        userDefinedData: null,
+        nickName: null,
+        accountName: null,
+        dueDate: 1633330800000,
+        amountDue: 3703.95,
+        lastPaymentAmount: 2.61,
+        lastPaymentDate: 1631602800000,
+        isEstimatedData: false,
+        billerAddress: {
+          address1: "PO BOX 30808",
+          address2: "LOS ANGELES  CA 90030-0808",
+          city: "LOS ANGELES ",
+          state: "CA",
+          zip: "90030-0808",
         },
-      paymentMethods: ['bank']
+        isAutoPay: null,
+        billStatus: null,
+        autoPayDate: null,
+        payFromId: null,
+        paymentMethod: null,
+      },
+      paymentMethods: ["bank"],
     };
     try {
       // const user = await this.services.dbcl.getUser('17ee21c4-e042-46f9-98e8-ac7224781920');
-      const user = { social:
-          { snapchat: null, twitter: null, instagram: null, facebook: null },
+      const user = {
+        social: {
+          snapchat: null,
+          twitter: null,
+          instagram: null,
+          facebook: null,
+        },
         shelter: null,
-        lastName: 'briggs',
-        dl: '',
+        lastName: "briggs",
+        dl: "",
         email: null,
         devTokens: [],
-        firstName: 'nathaniel',
+        firstName: "nathaniel",
         profileImage: null,
         balance: 0,
-        active: 'true',
+        active: "true",
         token:
-          'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE3ZWUyMWM0LWUwNDItNDZmOS05OGU4LWFjNzIyNDc4MTkyMCIsImlhdCI6MTYzMTY4NjI1NSwiaXNzIjoiYmlsbHplcm8ifQ.Jk6qLNJWgmN5XnHq7NByNQWa4wevBgwSww711OmYWmV2L-66JEGubZY2hNl19LjCT5j9Z3JcUuu8xqRLQhofwr12EqaobC93PpyCUBrsPV-V9fdE_d4m-txK6OUrN8PEgKrR2Smr92B5209bRtM8FElBzG9cGkXnNTwfpiJWnswIrT3Q341SQ1TQZOewWO2KrK5rbUrbaNaK9uNyP5OWMtFKg3LVsDt1hnc3HsrSuOPUxL0vzKrmm8Z2cKdLt2IwOHmdFlKn8KBV5BRxoZ10bQ3wL8dl7LBjyAIEApGuf0lcbFhOChWhbBH1vdxwXgYdjm8_ndVb8csZ_pgljv6fdA',
-        data: { billId: '051282b2-34b4-45bc-8413-6f79d23272e1' },
-        dob: { month: '09', day: '14', year: '2036' },
-        payment: { stripeId: 'cus_KEK0141Qx244SV' },
-        id: '17ee21c4-e042-46f9-98e8-ac7224781920',
-        loggedin: 'false',
-        phone: '+12342218202',
+          "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjE3ZWUyMWM0LWUwNDItNDZmOS05OGU4LWFjNzIyNDc4MTkyMCIsImlhdCI6MTYzMTY4NjI1NSwiaXNzIjoiYmlsbHplcm8ifQ.Jk6qLNJWgmN5XnHq7NByNQWa4wevBgwSww711OmYWmV2L-66JEGubZY2hNl19LjCT5j9Z3JcUuu8xqRLQhofwr12EqaobC93PpyCUBrsPV-V9fdE_d4m-txK6OUrN8PEgKrR2Smr92B5209bRtM8FElBzG9cGkXnNTwfpiJWnswIrT3Q341SQ1TQZOewWO2KrK5rbUrbaNaK9uNyP5OWMtFKg3LVsDt1hnc3HsrSuOPUxL0vzKrmm8Z2cKdLt2IwOHmdFlKn8KBV5BRxoZ10bQ3wL8dl7LBjyAIEApGuf0lcbFhOChWhbBH1vdxwXgYdjm8_ndVb8csZ_pgljv6fdA",
+        data: { billId: "051282b2-34b4-45bc-8413-6f79d23272e1" },
+        dob: { month: "09", day: "14", year: "2036" },
+        payment: { stripeId: "cus_KEK0141Qx244SV" },
+        id: "17ee21c4-e042-46f9-98e8-ac7224781920",
+        loggedin: "false",
+        phone: "+12342218202",
         action: null,
         settings: { push: false },
         pincode: null,
-        refid: 'foo6',
-        userName: 'moo6',
-        createdAt: '2021-09-14T23:10:55-07:00',
-        address:
-          { country: null,
-            state: 'CA',
-            postal_code: '90027',
-            city: 'los angeles',
-            line2: null,
-            line1: null },
-        homeless: 'false',
-        verified: 'true',
+        refid: "foo6",
+        userName: "moo6",
+        createdAt: "2021-09-14T23:10:55-07:00",
+        address: {
+          country: null,
+          state: "CA",
+          postal_code: "90027",
+          city: "los angeles",
+          line2: null,
+          line1: null,
+        },
+        homeless: "false",
+        verified: "true",
         gender: null,
-        ssn: '',
+        ssn: "",
         geo: { lat: null, lon: null, geohash: null },
-        veteran: 'false',
-        updatedAt: '2021-09-18T00:06:56.205Z' }
+        veteran: "false",
+        updatedAt: "2021-09-18T00:06:56.205Z",
+      };
       // const result = await axios.post('https://api2.branch.io/v1/url', {
       //   branch_key,
       //   channel: "in-app",
@@ -667,25 +673,35 @@ class adminClass {
       console.log(result.data);
       return result.data;
     } catch (e) {
-      console.log('testfunc error', e);
+      console.log("testfunc error", e);
     }
     return;
 
-    const {start, end} = this.services.utils.getTimeofDay();
+    const { start, end } = this.services.utils.getTimeofDay();
     // const timeStamp = 1631145600;
     // const {startDate, endDate} = this.services.utils.nextDateFromEpoch(timeStamp);
     // console.log(startDate)
     // console.log(endDate);
-    return await this.services.dbcl.getUVInfo('addff01b-fb82-4753-8187-313d01c50d55', start, end);
-    return await this.services.dbPlay.refreshCycle({playId: '1631491200', poolId: '9_1631491200'},
-      'addff01b-fb82-4753-8187-313d01c50d55',
-      'dc56b8df-4f4b-4a9f-98ab-4e5394b08a57', {by: 'uv', amount: 3});
+    return await this.services.dbcl.getUVInfo(
+      "addff01b-fb82-4753-8187-313d01c50d55",
+      start,
+      end
+    );
+    return await this.services.dbPlay.refreshCycle(
+      { playId: "1631491200", poolId: "9_1631491200" },
+      "addff01b-fb82-4753-8187-313d01c50d55",
+      "dc56b8df-4f4b-4a9f-98ab-4e5394b08a57",
+      { by: "uv", amount: 3 }
+    );
     let promises = [];
     promises.push(
-      this.services.msgcl.notifyUserByImpetus('play-uv-validated-payer',
-        {payerId: '943cda11-b7c9-48ad-90ac-daa7168c99be', payeeId: 'dc56b8df-4f4b-4a9f-98ab-4e5394b08a57'}));
+      this.services.msgcl.notifyUserByImpetus("play-uv-validated-payer", {
+        payerId: "943cda11-b7c9-48ad-90ac-daa7168c99be",
+        payeeId: "dc56b8df-4f4b-4a9f-98ab-4e5394b08a57",
+      })
+    );
     await Promise.all(promises);
-    console.log('TestFunction finished');
+    console.log("TestFunction finished");
     // return this.services.usercl.checkUserUVVirgin('addff01b-fb82-4753-8187-313d01c50d55');
     // await this.services.dbcl.putUserUV('addff01b-fb82-4753-8187-313d01c50d55', '35fd6313-6331-4e64-a917-4fa40ad7a29b');
     // return await this.services.engagementCL.getEngagement();
@@ -730,10 +746,9 @@ class adminClass {
       if (jwtDecode.role && jwtDecode.role === "admin") {
         var data = JSON.parse(event.body);
         if (!data) {
-          if (data.poolId === -1) { //global
-
+          if (data.poolId === -1) {
+            //global
           } else {
-
           }
         } else {
           // throw "InvalidPayload";
@@ -748,12 +763,10 @@ class adminClass {
 
   async getPlay(event) {
     try {
-
       //authorize
       var jwtDecode = await this.services.authcl.auth(event);
 
       return await this.services.dbcl.getKarmaOrgs();
-
 
       // if(jwtDecode.role && jwtDecode.role==="admin")  {
       //     return await this.services.dbcl.getKarmaOrgs();
@@ -764,7 +777,6 @@ class adminClass {
       throw error;
     }
   }
-
 
   // User module functions
 
@@ -785,8 +797,8 @@ class adminClass {
             user.profileImage = user.profileImage
               ? user.profileImage
               : "https://" +
-              process.env.BZ_S3_BACKET +
-              ".s3.amazonaws.com/users/profileImageDefault.jpg";
+                process.env.BZ_S3_BACKET +
+                ".s3.amazonaws.com/users/profileImageDefault.jpg";
           });
           return result;
         } else {
@@ -809,8 +821,8 @@ class adminClass {
           user.profileImage = user.profileImage
             ? user.profileImage
             : "https://" +
-            process.env.BZ_S3_BACKET +
-            ".s3.amazonaws.com/users/profileImageDefault.jpg";
+              process.env.BZ_S3_BACKET +
+              ".s3.amazonaws.com/users/profileImageDefault.jpg";
         });
         return result;
       } else {
@@ -838,8 +850,8 @@ class adminClass {
             user.profileImage = user.profileImage
               ? user.profileImage
               : "https://" +
-              process.env.BZ_S3_BACKET +
-              ".s3.amazonaws.com/users/profileImageDefault.jpg";
+                process.env.BZ_S3_BACKET +
+                ".s3.amazonaws.com/users/profileImageDefault.jpg";
           });
           return result;
         } else {
@@ -1051,13 +1063,13 @@ class adminClass {
           vendor.image = vendor.image
             ? vendor.image
             : "https://" +
-            process.env.BZ_S3_BACKET +
-            ".s3.amazonaws.com/vendors/imageDefault.jpg";
+              process.env.BZ_S3_BACKET +
+              ".s3.amazonaws.com/vendors/imageDefault.jpg";
           vendor.imagex = vendor.imagex
             ? vendor.imagex
             : "https://" +
-            process.env.BZ_S3_BACKET +
-            ".s3.amazonaws.com/vendors/imagexDefault.jpg";
+              process.env.BZ_S3_BACKET +
+              ".s3.amazonaws.com/vendors/imagexDefault.jpg";
           vendor.topVendorIndex = vendor.topVendorIndex
             ? parseInt(vendor.topVendorIndex)
             : 0;
@@ -1273,7 +1285,7 @@ class adminClass {
       throw error;
     }
   }
- 
+
   // Admin Testing functions
 
   async applyTestContentToUser(event) {
@@ -1442,8 +1454,7 @@ class adminClass {
         }
       }
       return "Done";
-    } catch (err) {
-    }
+    } catch (err) {}
   }
 
   async deleteTestContentUser(event) {
@@ -1545,29 +1556,34 @@ class adminClass {
       if (jwtDecode.role && jwtDecode.role === "admin") {
         var data = JSON.parse(event.body);
         console.log("killGame ", data);
-        const {playId} = data;
+        const { playId } = data;
         await this.services.uvcl.deleteItems();
         await this.services.engagementCL.deleteItems();
         const removedPlayIds = await this.services.dbPlay.deletePlay(playId);
-        const removedPoolIds = await this.services.dbPlay.deletePoolsByPlayId(playId);
+        const removedPoolIds = await this.services.dbPlay.deletePoolsByPlayId(
+          playId
+        );
         // const impetusPayload = await this.services.dbcl.getImpetusEntry('play-ending');
-        console.log('removedPoolIds ', removedPoolIds);
+        console.log("removedPoolIds ", removedPoolIds);
         let promises = [];
         for (const [key, value] of Object.entries(removedPoolIds)) {
           const pot = removedPlayIds[0].pot;
-          promises.push(new Promise((resolve, reject) => {
-            this.services.msgcl.notifyUserByImpetus('play-ending', {pot: pot, value: value})
-              .then((res) => {
-                resolve();
-              });
-          }));
+          promises.push(
+            new Promise((resolve, reject) => {
+              this.services.msgcl
+                .notifyUserByImpetus("play-ending", { pot: pot, value: value })
+                .then((res) => {
+                  resolve();
+                });
+            })
+          );
         }
         await Promise.all(promises);
       } else {
         throw "Forbidden";
       }
     } catch (error) {
-      console.log('err kill game: ', error);
+      console.log("err kill game: ", error);
       throw error;
     }
   }
@@ -1578,13 +1594,13 @@ class adminClass {
       if (jwtDecode.role && jwtDecode.role === "admin") {
         const data = JSON.parse(event.body);
         console.log("getPlayInfo", event.body);
-        const {playId} = data;
+        const { playId } = data;
         const allPlays = await this.services.dbPlay.getPlayInfo(playId);
-        console.log('getPlayInfo ret ', allPlays);
+        console.log("getPlayInfo ret ", allPlays);
         return allPlays;
       }
     } catch (err) {
-      console.log('getPlayInfo: ', err);
+      console.log("getPlayInfo: ", err);
       throw err;
     }
   }
@@ -1597,40 +1613,59 @@ class adminClass {
         const timeStamp = this.services.utils.dateToEpoch(new Date());
         const playInfo = await this.services.dbPlay.getPlayInfo(timeStamp);
         if (playInfo.pools.length > 0) {
-          return {newPlayId: timeStamp, msg: 'already exist'};
+          return { newPlayId: timeStamp, msg: "already exist" };
         }
 
         if (data && data.poolSize) {
-          const users = await this.services.dbcl.getUsersWithActiveBills('true');
-          console.log('adminGenGame 1');
-          const groups = await this.services.dbPlay.createGameWithUsers(users, data);
-          console.log('adminGenGame 2');
+          const users = await this.services.dbcl.getUsersWithActiveBills(
+            "true"
+          );
+          console.log("adminGenGame 1");
+          const groups = await this.services.dbPlay.createGameWithUsers(
+            users,
+            data
+          );
+          console.log("adminGenGame 2");
           const gameBillInfo = [];
           let promisesGroup = [];
-          console.log('adminGenGame 3');
+          console.log("adminGenGame 3");
           for (const _group of groups) {
-            promisesGroup.push(this.services.dbPlay.calculateProbability(_group));
+            promisesGroup.push(
+              this.services.dbPlay.calculateProbability(_group)
+            );
           }
           const result = await Promise.all(promisesGroup);
           // const billInfo = await this.services.dbPlay.calculateProbability(_group);
           let promisesEngagement = [];
           let promisesNotify = [];
           for (const _probabilityInfo of result) {
-            const {billInfo, group} = _probabilityInfo;
-            this.services.dbPlay.populateProbability(billInfo, group).then(() => {
-              console.log('Populating Probability succeed');
-            }).catch((err) => {
-              console.log('Populating Probability error: ', err);
-            });
+            const { billInfo, group } = _probabilityInfo;
+            this.services.dbPlay
+              .populateProbability(billInfo, group)
+              .then(() => {
+                console.log("Populating Probability succeed");
+              })
+              .catch((err) => {
+                console.log("Populating Probability error: ", err);
+              });
 
             gameBillInfo.push({
               poolId: group.id,
-              probInfo: billInfo
+              probInfo: billInfo,
             });
-            promisesEngagement.push(this.services.engagementCL.newEngagementByNewGame(
-              {value: billInfo, poolId: group.poolId, playId: group.playId}));
-            promisesNotify.push(this.services.msgcl.notifyUserByImpetus('play-start',
-              {pot: group.pot, value: billInfo}));
+            promisesEngagement.push(
+              this.services.engagementCL.newEngagementByNewGame({
+                value: billInfo,
+                poolId: group.poolId,
+                playId: group.playId,
+              })
+            );
+            promisesNotify.push(
+              this.services.msgcl.notifyUserByImpetus("play-start", {
+                pot: group.pot,
+                value: billInfo,
+              })
+            );
 
             // for (const bill of billInfo) {
             //   // msg = msg + `${bill.userid} 's probability is ${bill.prob}` + '\n';
@@ -1654,7 +1689,7 @@ class adminClass {
           await Promise.all(promisesNotify);
 
           console.log("admingenGame return", gameBillInfo);
-          return {newPlayId: groups[0].playId};
+          return { newPlayId: groups[0].playId };
         } else {
           throw "InvalidPayload";
         }
@@ -1662,7 +1697,7 @@ class adminClass {
         throw "Forbidden";
       }
     } catch (error) {
-      console.log('err genGame: ', error);
+      console.log("err genGame: ", error);
       throw error;
     }
   }
@@ -1673,7 +1708,7 @@ class adminClass {
       if (jwtDecode.role && jwtDecode.role === "admin") {
         if (event.body != null) {
           var data = JSON.parse(event.body);
-          console.log('getPoolInfo', data);
+          console.log("getPoolInfo", data);
           return await this.services.dbPlay.refreshPoolInfo(data.poolId);
         }
       }
@@ -1690,7 +1725,7 @@ class adminClass {
         // if (data && data.startDate !== undefined) {
         //   return await this.services.dbcl.getEngagementInfoByDate(data.startDate);
         // } else {
-        const {start, end} = this.services.utils.getTimeofDay();
+        const { start, end } = this.services.utils.getTimeofDay();
         return await this.services.engagementCL.getEngagement(start);
         // }
       } else {

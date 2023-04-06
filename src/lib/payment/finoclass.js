@@ -159,25 +159,34 @@ class finoClass {
     this.finoHost = process.env.FINO_API_URL;
     this.finoCode = process.env.FINO_CUSTOMER_CODE;
     this.finoPwd = process.env.FINO_PASSWORD;
-    this.paymentFieldsVCC = {}
-    this.paymentFieldsCC = {}
-    this.paymentFieldsBank = {}
-    this.getFinoSecrets().then(() => {
-      console.log("Fino Keys set successfully");
-    }).catch((err) => console.log(err))
-    this.getMeshPaymentVCCSecrets().then(() => {
-      console.log("MeshPayments VCC secets set successfully");
-    }).catch(err => console.log(err))
-    this.getBZCCSecrets().then(() => {
-      console.log("BZ CC secrets set successfully");
-    }).catch(err => console.log(err))
-    this.getBZACHSecrets().then(() => {
-      console.log("BZ ACH secrets set successfully");
-    }).catch((err) => console.log(err))
+    this.paymentFieldsVCC = {};
+    this.paymentFieldsCC = {};
+    this.paymentFieldsBank = {};
+    this.getFinoSecrets()
+      .then(() => {
+        console.log("Fino Keys set successfully");
+      })
+      .catch((err) => console.log(err));
+    this.getMeshPaymentVCCSecrets()
+      .then(() => {
+        console.log("MeshPayments VCC secets set successfully");
+      })
+      .catch((err) => console.log(err));
+    this.getBZCCSecrets()
+      .then(() => {
+        console.log("BZ CC secrets set successfully");
+      })
+      .catch((err) => console.log(err));
+    this.getBZACHSecrets()
+      .then(() => {
+        console.log("BZ ACH secrets set successfully");
+      })
+      .catch((err) => console.log(err));
   }
 
   async getFinoSecrets() {
-    const secretArn = "arn:aws:secretsmanager:us-east-1:853862264986:secret:fino-live-afz4XR";
+    const secretArn =
+      "arn:aws:secretsmanager:us-east-1:853862264986:secret:fino-live-afz4XR";
     const client = new SecretsManagerClient({
       region: "us-east-1",
     });
@@ -195,12 +204,13 @@ class finoClass {
       throw error;
     }
     const secrets = JSON.parse(response.SecretString);
-    this.findoCode = secrets['FINO_CUSTOMER_CODE'];
-    this.finoPwd = secrets['FINO_PASSWORD'];
+    this.findoCode = secrets["FINO_CUSTOMER_CODE"];
+    this.finoPwd = secrets["FINO_PASSWORD"];
   }
 
   async getMeshPaymentVCCSecrets() {
-    const secretArn = "arn:aws:secretsmanager:us-east-1:853862264986:secret:meshpayment/vcc-jqbpHS";
+    const secretArn =
+      "arn:aws:secretsmanager:us-east-1:853862264986:secret:meshpayment/vcc-jqbpHS";
     const client = new SecretsManagerClient({
       region: "us-east-1",
     });
@@ -217,54 +227,55 @@ class finoClass {
       console.log(error);
       throw error;
     }
-    const secrets = JSON.parse(response.SecretString);  
+    const secrets = JSON.parse(response.SecretString);
     const vcc = [
       {
         name: "Card Number",
-        stringValue: secrets['cc'],
+        stringValue: secrets["cc"],
       },
       {
         name: "Card Expiry MM",
-        stringValue: secrets['mm'],
+        stringValue: secrets["mm"],
       },
       {
         name: "Card Expiry YYYY",
-        stringValue: secrets['yyyy'],
+        stringValue: secrets["yyyy"],
       },
       {
         name: "CVV",
-        stringValue: secrets['cvv'],
+        stringValue: secrets["cvv"],
       },
       {
         name: "Name on Card",
-        stringValue: secrets['name'],
+        stringValue: secrets["name"],
       },
       {
         name: "Card Billing Address : Zip",
-        stringValue: secrets['zip'],
+        stringValue: secrets["zip"],
       },
       {
         name: "Card Billing Address : Address Line1",
-        stringValue: secrets['addr1'],
+        stringValue: secrets["addr1"],
       },
       {
         name: "Card Billing Address : Address Line2",
-        stringValue: secrets['addr2'],
+        stringValue: secrets["addr2"],
       },
       {
         name: "Card Billing Address : City",
-        stringValue: secrets['city'],
+        stringValue: secrets["city"],
       },
       {
         name: "Card Billing Address : State",
-        stringValue: secrets['state'],
+        stringValue: secrets["state"],
       },
     ];
     this.paymentFieldsVCC = vcc;
   }
 
   async getBZCCSecrets() {
-    const secretArn = "arn:aws:secretsmanager:us-east-1:853862264986:secret:bz-cc-live-xQf90X";
+    const secretArn =
+      "arn:aws:secretsmanager:us-east-1:853862264986:secret:bz-cc-live-xQf90X";
     const client = new SecretsManagerClient({
       region: "us-east-1",
     });
@@ -281,54 +292,55 @@ class finoClass {
       console.log(error);
       throw error;
     }
-    const secrets = JSON.parse(response.SecretString);  
+    const secrets = JSON.parse(response.SecretString);
     const cc = [
       {
         name: "Card Number",
-        stringValue: secrets['cc'],
+        stringValue: secrets["cc"],
       },
       {
         name: "Card Expiry MM",
-        stringValue: secrets['mm'],
+        stringValue: secrets["mm"],
       },
       {
         name: "Card Expiry YYYY",
-        stringValue: secrets['yyyy'],
+        stringValue: secrets["yyyy"],
       },
       {
         name: "CVV",
-        stringValue: secrets['cvv'],
+        stringValue: secrets["cvv"],
       },
       {
         name: "Name on Card",
-        stringValue: secrets['name'],
+        stringValue: secrets["name"],
       },
       {
         name: "Card Billing Address : Zip",
-        stringValue: secrets['zip'],
+        stringValue: secrets["zip"],
       },
       {
         name: "Card Billing Address : Address Line1",
-        stringValue: secrets['addr1'],
+        stringValue: secrets["addr1"],
       },
       {
         name: "Card Billing Address : Address Line2",
-        stringValue: secrets['addr2'],
+        stringValue: secrets["addr2"],
       },
       {
         name: "Card Billing Address : City",
-        stringValue: secrets['city'],
+        stringValue: secrets["city"],
       },
       {
         name: "Card Billing Address : State",
-        stringValue: secrets['state'],
+        stringValue: secrets["state"],
       },
     ];
     this.paymentFieldsCC = cc;
   }
 
   async getBZACHSecrets() {
-    const secretArn = "arn:aws:secretsmanager:us-east-1:853862264986:secret:bz-ach-live-pPtbVO";
+    const secretArn =
+      "arn:aws:secretsmanager:us-east-1:853862264986:secret:bz-ach-live-pPtbVO";
     const client = new SecretsManagerClient({
       region: "us-east-1",
     });
@@ -345,16 +357,16 @@ class finoClass {
       console.log(error);
       throw error;
     }
-    const secrets = JSON.parse(response.SecretString);  
-    
+    const secrets = JSON.parse(response.SecretString);
+
     const paymentFieldsBank = [
       {
         name: "Bank Routing Number",
-        stringValue: secrets['rt'],
+        stringValue: secrets["rt"],
       },
       {
         name: "Bank Account Number",
-        stringValue: secrets['acct'],
+        stringValue: secrets["acct"],
       },
       {
         name: "Bank Account Type",
@@ -406,7 +418,7 @@ class finoClass {
   }
 
   getFinos() {
-    return this.paymentFieldsBank
+    return this.paymentFieldsBank;
   }
 
   getAllProviders() {
