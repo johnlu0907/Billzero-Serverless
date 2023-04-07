@@ -9,147 +9,6 @@ const {
 } = require("@aws-sdk/client-secrets-manager");
 const CONTENT_TYPE = "application/json";
 
-// const paymentFieldsCC = [
-//   {
-//     name: "Card Number",
-//     stringValue: "4065 9400 6345 3568",
-//   },
-//   {
-//     name: "Card Expiry MM",
-//     stringValue: "03",
-//   },
-//   {
-//     name: "Card Expiry YYYY",
-//     stringValue: "2028",
-//   },
-//   {
-//     name: "CVV",
-//     stringValue: "569",
-//   },
-//   {
-//     name: "Name on Card",
-//     stringValue: "John Doe",
-//   },
-//   {
-//     name: "Card Billing Address : Zip",
-//     stringValue: "90021",
-//   },
-//   {
-//     name: "Card Billing Address : Address Line1",
-//     stringValue: "1250 long beach ave",
-//   },
-//   {
-//     name: "Card Billing Address : Address Line2",
-//     stringValue: "apt 226",
-//   },
-//   {
-//     name: "Card Billing Address : City",
-//     stringValue: "Los Angeles",
-//   },
-//   {
-//     name: "Card Billing Address : State",
-//     stringValue: "CA",
-//   },
-// ];
-
-// const paymentFieldsVCC = [
-//   {
-//     name: "Card Number",
-//     stringValue: "4065 9400 6345 3568",
-//   },
-//   {
-//     name: "Card Expiry MM",
-//     stringValue: "03",
-//   },
-//   {
-//     name: "Card Expiry YYYY",
-//     stringValue: "2028",
-//   },
-//   {
-//     name: "CVV",
-//     stringValue: "569",
-//   },
-//   {
-//     name: "Name on Card",
-//     stringValue: "John Doe",
-//   },
-//   {
-//     name: "Card Billing Address : Zip",
-//     stringValue: "90021",
-//   },
-//   {
-//     name: "Card Billing Address : Address Line1",
-//     stringValue: "1250 long beach ave",
-//   },
-//   {
-//     name: "Card Billing Address : Address Line2",
-//     stringValue: "apt 226",
-//   },
-//   {
-//     name: "Card Billing Address : City",
-//     stringValue: "Los Angeles",
-//   },
-//   {
-//     name: "Card Billing Address : State",
-//     stringValue: "CA",
-//   },
-// ];
-
-// const paymentFieldsBank = [
-//   {
-//     name: "Bank Routing Number",
-//     stringValue: "322271627",
-//   },
-//   {
-//     name: "Bank Account Number",
-//     stringValue: "532027338",
-//   },
-//   {
-//     name: "Bank Account Type",
-//     stringValue: "3",
-//   },
-//   {
-//     name: "Service Address : Address Line1",
-//     stringValue: "1250 LONG BEACH AVE APT 226",
-//   },
-//   {
-//     name: "Service Address : City",
-//     stringValue: "LOS ANGELES",
-//   },
-//   {
-//     name: "Service Address : State",
-//     stringValue: "CA",
-//   },
-//   {
-//     name: "Service Address : Zip",
-//     stringValue: "90021",
-//   },
-//   {
-//     name: "Service Address : Phone",
-//     stringValue: "602-795-2289",
-//   },
-//   {
-//     name: "Service Address : House Number",
-//     stringValue: "1",
-//   },
-//   {
-//     name: "Service Address : Registered Email",
-//     stringValue: "ctoxyz@gmail.com",
-//   },
-//   {
-//     name: "Bank Account Holder Name",
-//     stringValue: "BILLZERO INC",
-//   },
-//   {
-//     name: "Nick Name",
-//     stringValue: "BZCHASE",
-//   },
-//   {
-//     name: "Select Your Bank Account Use",
-//     stringValue: "Business",
-//   },
-// ];
-
 class finoClass {
   constructor(args) {
     for (var parameter in args) {
@@ -157,8 +16,8 @@ class finoClass {
     }
     this.services.addService("finocl", this);
     this.finoHost = process.env.FINO_API_URL;
-    this.finoCode = process.env.FINO_CUSTOMER_CODE;
-    this.finoPwd = process.env.FINO_PASSWORD;
+    this.finoCode = "";
+    this.finoPwd = "";
     this.paymentFieldsVCC = {};
     this.paymentFieldsCC = {};
     this.paymentFieldsBank = {};
@@ -204,7 +63,7 @@ class finoClass {
       throw error;
     }
     const secrets = JSON.parse(response.SecretString);
-    this.findoCode = secrets["FINO_CUSTOMER_CODE"];
+    this.finoCode = secrets["FINO_CUSTOMER_CODE"];
     this.finoPwd = secrets["FINO_PASSWORD"];
   }
 
@@ -416,11 +275,7 @@ class finoClass {
 
     this.paymentFieldsBank = paymentFieldsBank;
   }
-
-  getFinos() {
-    return this.paymentFieldsBank;
-  }
-
+  
   getAllProviders() {
     return this.get("/providers/all");
   }
@@ -546,6 +401,7 @@ class finoClass {
       paymentFields: this.paymentFieldsCC.concat(additionalFields),
       callbackUrl: process.env.FINO_BILL_WEBHOOK_URL,
     };
+    console.log(data, "payment Field CC");
     return this.post(
       `/users/${userId}/paymentMethod/creditcard/directPayment`,
       data
@@ -562,6 +418,7 @@ class finoClass {
       paymentFields: this.paymentFieldsVCC.concat(additionalFields),
       callbackUrl: process.env.FINO_BILL_WEBHOOK_URL,
     };
+    console.log(data, "payment Field VCC");
     return this.post(
       `/users/${userId}/paymentMethod/creditcard/directPayment`,
       data
@@ -673,7 +530,7 @@ class finoClass {
     try {
       return JSON.parse(content);
     } catch (error) {
-      console.log("json_decode error:", error);
+      console.log("json_decode error:", content, error);
       return {};
     }
   }

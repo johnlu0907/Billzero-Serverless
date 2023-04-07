@@ -64,13 +64,13 @@ class messagingClass {
       try {
         const prefix = "BillZero | ";
         this.iconsole.log({ to: to, message: message, from: from });
-        var message = await twiliocl.messages.create({
-          body: prefix + message,
+        var msg = await twiliocl.messages.create({
+          body: `${prefix}${message}`,
           to: to,
           from: from,
         });
 
-        this.iconsole.log(message);
+        this.iconsole.log(msg);
 
         return {
           status: "sms sent",

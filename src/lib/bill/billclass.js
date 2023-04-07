@@ -214,9 +214,9 @@ class billClass {
               let valid = false;
               await this.services.dbcl.putUserUV(user.id, viewer.id);
 
-              let msg = "BillZero | @" + viewer.userName + " viewed your Bills";
+              let msg = "@" + viewer.userName + " viewed your Bills";
               console.log(
-                `BillZero | @${viewer.userName} viewed ${user.userName} Bills`
+                `@${viewer.userName} viewed ${user.userName} Bills`
               );
               await this.services.msgcl.notifyUser(user.id, msg);
             }
@@ -1299,7 +1299,7 @@ class billClass {
           this.iconsole.log("Fino pay result: ", payResult);
 
           if (payResult.operationStatus === "SUCCESS") {
-            // let msg = "BillZero | "+user.userName+" paid $"+dataBillZeroFees.amount+" ur "+this.services.utils.titleCase(bill.name)+" bill";
+            // let msg = user.userName+" paid $"+dataBillZeroFees.amount+" ur "+this.services.utils.titleCase(bill.name)+" bill";
             // await this.services.msgcl.notifyUser(bill.uid,msg);
 
             await this.services.dbcl.putUTOU({
@@ -1546,7 +1546,7 @@ class billClass {
           this.iconsole.log("Fino pay result: ", payResult);
 
           if (payResult.operationStatus === "SUCCESS") {
-            // let msg = "BillZero | "+user.userName+" paid $"+dataBillZeroFees.amount+" ur "+this.services.utils.titleCase(bill.name)+" bill";
+            // let msg = user.userName+" paid $"+dataBillZeroFees.amount+" ur "+this.services.utils.titleCase(bill.name)+" bill";
             // await this.services.msgcl.notifyUser(bill.uid,msg);
 
             // send to user
@@ -1796,14 +1796,14 @@ class billClass {
               trackingToken,
             },
           });
-          // let msg = "BillZero | "+this.services.utils.titleCase(transaction.billerName)+" rejected $"+transaction.amountToAddBalance+" for bill";
+          // let msg = this.services.utils.titleCase(transaction.billerName)+" rejected $"+transaction.amountToAddBalance+" for bill";
           // const action = status.errors[0].actionToBeTaken ? ".  " + status.errors[0].actionToBeTaken.replace(/Finovera/g, "BillZero") : "";
           // await this.services.msgcl.notifyUser(transaction.uid, msg + action);
           // await this.services.stripecl.refundCharge(transaction.chargeId);
         } else {
           transaction.status = "paid";
           if (status.connectionStatus === "COMPLETED") {
-            let receiveSMS = `BillZero | Your ${this.services.utils.titleCase(
+            let receiveSMS = `Your ${this.services.utils.titleCase(
               transaction.billerName
             )} bill received a payment`;
             if (
@@ -1815,7 +1815,6 @@ class billClass {
             await this.services.msgcl.notifyUser(transaction.uid, receiveSMS);
             await this.services.msgcl.notifyUser(
               transaction.payerId,
-              "BillZero | " +
                 transaction.userName +
                 " received $" +
                 transaction.amountToAddBalance +
@@ -1823,10 +1822,10 @@ class billClass {
                 this.services.utils.titleCase(transaction.billerName) +
                 " bill"
             );
-            // "BillZero | "+transaction.payerUserName+" paid $"+transaction.amountToAddBalance+" ur "+this.services.utils.titleCase(transaction.billerName)+" bill"
-            // "BillZero | "+transaction.userName+" received $"+transaction.amountToAddBalance+" for "+this.services.utils.titleCase(transaction.billerName)+" bill"
+            // ""+transaction.payerUserName+" paid $"+transaction.amountToAddBalance+" ur "+this.services.utils.titleCase(transaction.billerName)+" bill"
+            // ""+transaction.userName+" received $"+transaction.amountToAddBalance+" for "+this.services.utils.titleCase(transaction.billerName)+" bill"
             // await this.services.msgcl.notifyUser(transaction.payerId,
-            //   "BillZero | "+this.services.utils.titleCase(transaction.billerName)+" received $"+transaction.amountToAddBalance+" for bill"
+            //   ""+this.services.utils.titleCase(transaction.billerName)+" received $"+transaction.amountToAddBalance+" for bill"
             // );
           }
 
@@ -2073,7 +2072,7 @@ class billClass {
         //   bill.mfaChallenges = status.mfaList;
         //   await this.services.dbcl.putUserBill(bill);
 
-        //   const msg = `BillZero | ${transaction.payerUserName} is paying your ${providerName} bill. Please enter MFA on profile bills`;
+        //   const msg = `${transaction.payerUserName} is paying your ${providerName} bill. Please enter MFA on profile bills`;
         //   await this.services.msgcl.notifyUser(transaction.uid, msg);
         // }    MFA payment. NEED TO BE IMPLEMENTED IN FUTURE
         if (dbBill.active === "false") {
