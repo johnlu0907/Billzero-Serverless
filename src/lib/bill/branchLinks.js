@@ -12,7 +12,7 @@ function createUserBillLink(user, bill, isForceRefresh) {
     campaign: "BillZero",
     feature: "user-mr",
     tags: tags,
-    type: 2,
+    type: 1,
     data: {
       bzdata: {
         userId: user.id,
