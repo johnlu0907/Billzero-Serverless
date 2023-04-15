@@ -12,6 +12,7 @@ var Ajv = require("ajv");
 var ajv = new Ajv({ useDefaults: true });
 
 const randomWord = require("random-word");
+const { createThxLink } = require("../bill/branchLinks");
 
 const branch_key = "key_live_piT9H2dFIkvOy32aRyZR2ebnqCiYKIGm";
 const branch_secret = "secret_live_GXFqJ7WqmNTOtabjxGEfsWSqhSJRusgB";
@@ -989,13 +990,15 @@ class userclass {
         );
         let userInboundPayments =
           await this.services.dbcl.getUserInboundTransactions(jwtDecode.id);
+        console.log(userPayments, "user payments");
+        console.log(userInboundPayments, "user inbound payments");
         userInboundPayments.forEach((item) => {
-          let res = userPayments.find((x) => x.chargeid === item.chargeid);
+          let res = userPayments.find((x) => x.chargeId === item.chargeId);
           if (!res) {
             userPayments.push(item);
           }
         });
-
+        console.log(userPayments, "user payments 2");
         userPayments = userPayments.sort(
           (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
         );
@@ -1077,6 +1080,14 @@ class userclass {
               profileImage: trPayer.profileImage,
               thanks: trPayer.thanks !== undefined ? trPayer.thanks : false,
             };
+            item.thx = item.thx ? item.thx : item.uid === item.payerInfo.id ? '0' : '1'; 
+            /**
+             * 0: I paid to my bill
+             * 1: Say Thx
+             * 2: View Thx
+             * 3: Already View Thx
+             */
+            item.thxMode = jwtDecode.id === item.uid ? '0' : '1';  // 0 => say thx, 1 => view thx
           });
         }
 
@@ -1488,29 +1499,32 @@ class userclass {
         throw "Forbidden";
       }
       var data = JSON.parse(event.body);
-      if (data) {
-        data.fileName =
-          data.uri && data.uri.trim() ? data.uri : `thx${this.count}.jpg`;
-        this.count = this.count + 1;
-        var path = "users/" + jwtDecode.id + "/" + data.fileName;
-        // let imagePath =
-        //       "users/" +
-        //       jwtDecode.id +
-        //       "/" +
-        //       uuid.v4();
-        //     imageUrl = await this.services.dbcl.uploadBase64ImageToAwsS3(
-        //       imagePath,
-        //       data.fileName
-        //     );
+      const generateRandomString = () => {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < 32; i++) {
+          result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+      }
 
+      if (data) {
+        const uuid = generateRandomString();
+        data.fileName =
+          data.uri && data.uri.trim()
+            ? data.uri
+            : `${uuid}.${data.type}`;
+        var path = "users/" + jwtDecode.id + "/" + data.fileName;
         var presignedUrl = await this.services.dbcl.createAwsS3PutPresignedUrl(
           path,
           3000
         );
-        var imageUrl = presignedUrl.split("?")[0];
+        var mediaUrl = presignedUrl.split("?")[0];
         return {
           presignedUrl: presignedUrl,
-          imageUrl: imageUrl,
+          mediaUrl: mediaUrl,
+          key: path,
           presignedUrlTTL: 3000,
         };
       } else {
@@ -1521,18 +1535,68 @@ class userclass {
     }
   }
 
-  async AwsS3PictureDeletion(event) {
+  async sayThx(event) {
     try {
       var jwtDecode = await this.services.authcl.auth(event);
-      var data = JSON.parse(event.body);
-      var s3Bucket = data.bucketParams.Bucket;
-      var s3Key = data.bucketParams.Key;
-      // Delete the object.
-      // console.log(`\nDeleting object "${bucketParams.Key}"} from bucket`);
-      var deletePicture = await s3Client.send(
-        new DeleteObjectCommand({ Bucket: s3Bucket, Key: s3Key })
-      );
-      return deletePicture;
+      if (jwtDecode.id === process.env.DEFAULTUSERID) {
+        throw "Forbidden";
+      } else {
+        var data = JSON.parse(event.body);
+        var s3Key = data.key;
+        var thxUrl = data.url;
+        var payerId = data.payerId;
+        var userName = data.userName;
+        var transactionId = data.transactionId;
+        var transaction = await this.services.dbcl.getTransactionById(transactionId);
+        transaction.thxUrl = thxUrl;
+        transaction.s3Key = s3Key;
+        transaction.thx = '2';
+        const payer = await this.services.dbcl.getUser(payerId);
+        const result = await createThxLink(payer, transaction);
+        const dl = result.data.url;
+        transaction.thxDL = dl;
+        await this.services.dbcl.putUserTransaction(transaction);
+        await this.services.msgcl.notifyUser(payerId, `BillZero @${userName} Says Thanks! \n ${dl}`);
+      }
+    } catch(err) {
+      console.log("Error deleting object", err);
+      return err;
+    }
+  }
+
+  async viewThx(event) {
+    try {
+      var jwtDecode = await this.services.authcl.auth(event);
+      if (jwtDecode.id === process.env.DEFAULTUSERID) {
+        throw "Forbidden";
+      } else {
+        var data = JSON.parse(event.body);
+        var s3Key = data.key;
+        var transactionId = data.transactionId;
+        var transaction = await this.services.dbcl.getTransactionById(transactionId);
+        transaction.thx = '3';
+        await this.services.dbcl.putUserTransaction(transaction);
+        await this.services.dbcl.deleteS3Object(s3Key);
+        return transaction;
+        // await this.services.msgcl.notifyUser(payerId, `BillZero @${userName} Says Thanks!`);
+      }
+    } catch(err) {
+      console.log("Error deleting object", err);
+      return err;
+    }
+  }
+
+  async AwsS3Deletion(event) {
+    try {
+      var jwtDecode = await this.services.authcl.auth(event);
+      if (jwtDecode.id === process.env.DEFAULTUSERID) {
+        throw "Forbidden";
+      } else {
+        var data = JSON.parse(event.body);
+        var s3Key = data.key;
+        var deletePicture = await this.services.dbcl.deleteS3Object(s3Key);
+        return deletePicture;  
+      }
     } catch (err) {
       console.log("Error deleting object", err);
       return err;

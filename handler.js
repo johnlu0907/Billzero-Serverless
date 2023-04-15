@@ -265,6 +265,12 @@ module.exports.UserManage = async (event) => {
       } else if (fn == "validatephone") {
         response.OK.body.payload = await usercl.validatePhone(event);
         return response.success();
+      } else if (fn == "sayThx") {
+        response.OK.body.payload = await usercl.sayThx(event);
+        return response.success();
+      } else if (fn == "viewThx") {
+        response.OK.body.payload = await usercl.viewThx(event);
+        return response.success();
       } else if (fn == "creates3presignedurl") {
         response.OK.body.payload = await usercl.createAwsS3PutPresignedUrl(
           event
@@ -275,8 +281,8 @@ module.exports.UserManage = async (event) => {
           event
         );
         return response.success();
-      } else if (fn == "awsS3PictureDeletion") {
-        response.OK.body.payload = await usercl.AwsS3PictureDeletion(event);
+      } else if (fn == "awsS3Deletion") {
+        response.OK.body.payload = await usercl.AwsS3Deletion(event);
         return response.success;
       } else if (fn == "addpaymentmethod") {
         response.OK.body.payload = await usercl.addPaymentMethod(event);

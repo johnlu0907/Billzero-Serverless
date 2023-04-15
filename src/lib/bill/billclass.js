@@ -41,26 +41,40 @@ class billClass {
   }
 
   async createDeepLink(event) {
-    // try {
-    //   var jwtDecode = await this.services.authcl.auth(event);
-    //   var data = JSON.parse(event.body);
-    //   if(data && data.billId)  {
-    //     data.amount = data.amount ? Number(data.amount):0;
-    //     var bill = await this.services.dbcl.getUserBillById(data.billId);
-    //     var promocode = pwdgen.generate({ length: 10, numbers: true});
-    //     var billpromo = {
-    //       id:promocode,
-    //       billId:data.billId,
-    //       amount:data.amount,
-    //       link:"billzero://paybill/"+promocode
-    //     }
-    //     return await this.services.dbcl.putPromocode(billpromo);
-    //   } else {
-    //       throw "InvalidPayload";
-    //   }
-    // } catch (error) {
-    //     throw error;
-    // }
+    try {
+      var jwtDecode = await this.services.authcl.auth(event);
+      var data = JSON.parse(event.body);
+      if (data && data.billId) {
+        data.amount = data.amount ? Number(data.amount) : 0;
+        var bill, user;
+        if (jwtDecode.role && jwtDecode.role == "admin") {
+          bill = await this.services.dbcl.getUserBillByBillerId(data.uid, data.billId);
+          user = await this.services.dbcl.getUser(data.uid);  
+        } else {
+          bill = await this.services.dbcl.getUserBillByBillerId(jwtDecode.id, data.billId);
+          user = await this.services.dbcl.getUser(jwtDecode.id);  
+        }
+        const result = await createUserBillLink(user, bill, false);
+        console.log(result);
+        const url = result.data.url;
+        bill.dl = url;
+        const billpromo = {
+          id: url.substr(url.length - 11),
+          userId: user.id,
+          billId: bill.id,
+          url: url,
+        };
+        await Promise.all([
+          this.services.dbcl.putPromocode(billpromo),
+          this.services.dbcl.putUserBill(bill),
+        ]);
+        return bill;
+      } else {
+        throw "InvalidPayload";
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getDeepLinkBill(event) {
@@ -215,9 +229,7 @@ class billClass {
               await this.services.dbcl.putUserUV(user.id, viewer.id);
 
               let msg = "@" + viewer.userName + " viewed your Bills";
-              console.log(
-                `@${viewer.userName} viewed ${user.userName} Bills`
-              );
+              console.log(`@${viewer.userName} viewed ${user.userName} Bills`);
               await this.services.msgcl.notifyUser(user.id, msg);
             }
           } else {
@@ -1802,6 +1814,7 @@ class billClass {
           // await this.services.stripecl.refundCharge(transaction.chargeId);
         } else {
           transaction.status = "paid";
+          transaction.thx = transaction.uid === transaction.payerId ? '0' : '1';
           if (status.connectionStatus === "COMPLETED") {
             let receiveSMS = `Your ${this.services.utils.titleCase(
               transaction.billerName
@@ -1815,7 +1828,7 @@ class billClass {
             await this.services.msgcl.notifyUser(transaction.uid, receiveSMS);
             await this.services.msgcl.notifyUser(
               transaction.payerId,
-                transaction.userName +
+              transaction.userName +
                 " received $" +
                 transaction.amountToAddBalance +
                 " for " +

@@ -31,6 +31,31 @@ function createUserBillLink(user, bill, isForceRefresh) {
   return branch.createDeepLink(options);
 }
 
+function createThxLink(user, transaction) {
+  const tags = [`u - ${user.userName}`, `view-thx`];
+
+  const options = {
+    channel: "in-app",
+    stage: "refresh",
+    campaign: "BillZero",
+    feature: "user-thx",
+    tags: tags,
+    type: 1,
+    data: {
+      bzdata: {
+        userId: user.id,
+        userName: user.userName,
+        transactionId: transaction.id,
+        url: transaction.thxUrl,
+        key: transaction.key,
+        navgationTarget: 'viewThx'
+      },
+    },
+  }
+  return branch.createDeepLink(options);
+}
+
 module.exports = {
   createUserBillLink,
+  createThxLink,
 };
