@@ -13,6 +13,7 @@ var ajv = new Ajv({ useDefaults: true });
 
 const randomWord = require("random-word");
 const { createThxLink } = require("../bill/branchLinks");
+const { deleteDeepLink } = require("../utils/branch");
 
 const branch_key = "key_live_piT9H2dFIkvOy32aRyZR2ebnqCiYKIGm";
 const branch_secret = "secret_live_GXFqJ7WqmNTOtabjxGEfsWSqhSJRusgB";
@@ -1515,7 +1516,7 @@ class userclass {
           data.uri && data.uri.trim()
             ? data.uri
             : `${uuid}.${data.type}`;
-        var path = "users/" + jwtDecode.id + "/" + data.fileName;
+        var path = "users/thx/" + jwtDecode.id + "/" + data.fileName;
         var presignedUrl = await this.services.dbcl.createAwsS3PutPresignedUrl(
           path,
           3000
@@ -1556,7 +1557,7 @@ class userclass {
         const dl = result.data.url;
         transaction.thxDL = dl;
         await this.services.dbcl.putUserTransaction(transaction);
-        await this.services.msgcl.notifyUser(payerId, `BillZero @${userName} Says Thanks! \n ${dl}`);
+        await this.services.msgcl.notifyUser(payerId, `@${userName} Says Thanks! \n ${dl}`);
       }
     } catch(err) {
       console.log("Error deleting object", err);
@@ -1574,9 +1575,18 @@ class userclass {
         var s3Key = data.key;
         var transactionId = data.transactionId;
         var transaction = await this.services.dbcl.getTransactionById(transactionId);
+        if (transaction.payerId != jwtDecode.id) {
+          throw "Forbidden";
+        }
         transaction.thx = '3';
+        if (s3Key != transaction.s3Key) {
+          throw "s3 Keys are different";
+        }
+        if (transaction.thxDL) {
+          await deleteDeepLink(transaction.thxDL);
+        }
         await this.services.dbcl.putUserTransaction(transaction);
-        await this.services.dbcl.deleteS3Object(s3Key);
+        await this.services.dbcl.deleteS3Object(transaction.s3Key);
         return transaction;
         // await this.services.msgcl.notifyUser(payerId, `BillZero @${userName} Says Thanks!`);
       }

@@ -2679,8 +2679,8 @@ class dbHelperClass {
   async deleteS3Object(key) {
     var params = {Bucket: process.env.BZ_S3_BACKET, Key: key};
     try {
-      const data = await s3.deleteObject(params);
-      console.log('Object deleted successfully');
+      const data = await s3.deleteObject(params).promise();
+      console.log('Object deleted successfully', data );
       return data;
     } catch(err) {
       console.log(err, err.stack);

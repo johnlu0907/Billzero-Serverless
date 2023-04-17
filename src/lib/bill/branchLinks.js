@@ -47,8 +47,8 @@ function createThxLink(user, transaction) {
         userName: user.userName,
         transactionId: transaction.id,
         url: transaction.thxUrl,
-        key: transaction.key,
-        navgationTarget: 'viewThx'
+        key: transaction.s3Key,
+        navigationTarget: 'viewThx'
       },
     },
   }
