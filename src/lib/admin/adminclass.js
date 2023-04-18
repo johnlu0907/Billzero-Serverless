@@ -284,6 +284,7 @@ class adminClass {
               "geo",
               "ssn",
               "shelter",
+              "phone",
             ],
             action: "allow",
           };
@@ -295,6 +296,11 @@ class adminClass {
           );
           user = await this.services.dbcl.putUser(user);
           delete user.password;
+          user.profileImage = user.profileImage
+            ? user.profileImage
+            : "https://" +
+              process.env.BZ_S3_BACKET +
+              ".s3.amazonaws.com/users/profileImageDefault.jpg";
           return user;
         } else {
           throw "InvalidPayload";
