@@ -1088,7 +1088,11 @@ class userclass {
              * 2: View Thx
              * 3: Already View Thx
              */
-            item.thxMode = jwtDecode.id === item.uid ? '0' : '1';  // 0 => say thx, 1 => view thx
+            if (jwtDecode.id === item.uid) {
+                item.thxMode = item.thx !== '2' && item.thx !== '3' ? '0' : '1';  // 0 => say thx, 1 => view thx
+            } else {
+              item.thxMode = '1';  // 0 => say thx, 1 => view thx
+            }
           });
         }
 
@@ -1577,6 +1581,9 @@ class userclass {
         var transaction = await this.services.dbcl.getTransactionById(transactionId);
         if (transaction.payerId != jwtDecode.id) {
           throw "Forbidden";
+        }       
+        if (transaction.thx === '3') {
+          throw "Already Viewed";
         }
         transaction.thx = '3';
         if (s3Key != transaction.s3Key) {
@@ -1585,10 +1592,10 @@ class userclass {
         if (transaction.thxDL) {
           await deleteDeepLink(transaction.thxDL);
         }
+        transaction.thxViewed = new Date().toISOString();
         await this.services.dbcl.putUserTransaction(transaction);
         await this.services.dbcl.deleteS3Object(transaction.s3Key);
         return transaction;
-        // await this.services.msgcl.notifyUser(payerId, `BillZero @${userName} Says Thanks!`);
       }
     } catch(err) {
       console.log("Error deleting object", err);
